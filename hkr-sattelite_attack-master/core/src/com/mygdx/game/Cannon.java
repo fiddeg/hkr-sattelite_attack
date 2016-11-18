@@ -30,33 +30,6 @@ public class Cannon extends Figure{
         }
 
 
-        public void go360(){
-            //lägg in bild med rotation för cannon istället för bild på spaceship
-            //updateImage("SpaceshipBoost.png");
-            setTranslateY(3);
-            //getSprite().setRotation(0);
-        }
-
-        public void go180(){
-            //lägg in bild med rotation för cannon istället för bild på spaceship
-            //updateImage("SpaceshipBoost.png");
-            setTranslateY(-3);
-            //getSprite().setRotation(180);
-        }
-
-        public void go270(){
-            //lägg in bild med rotation för cannon istället för bild på spaceship
-            //updateImage("SpaceshipBoost.png");
-            setTranslateX(-3);
-            //getSprite().setRotation(90);
-        }
-
-        public void go90(){
-            //lägg in bild med rotation för cannon istället för bild på spaceship
-            //updateImage("SpaceshipBoost.png");
-            setTranslateX(3);
-            //getSprite().setRotation(-90);
-        }
 
         public void stop(){
             setSpeedX(0);
