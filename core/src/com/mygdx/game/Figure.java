@@ -93,13 +93,6 @@ public class Figure {
         sprite.draw(batch);
     }
 
-    public void bounceAtEdge(){
-        if ((getX()> Gdx.graphics.getWidth()-sprite.getWidth()) || (getX()<0))
-            setSpeedX(-getSpeedX());
-        if ((getY()>Gdx.graphics.getHeight()-sprite.getHeight()) || (getY()<0))
-            setSpeedY(-getSpeedY());
-    }
-
     public void stopAtEdge(){
         if (getX()>Gdx.graphics.getWidth()-sprite.getWidth())
             setX(Gdx.graphics.getWidth()-sprite.getWidth());
