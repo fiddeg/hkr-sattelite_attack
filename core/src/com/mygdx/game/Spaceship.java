@@ -22,25 +22,21 @@ public class Spaceship extends Figure{
     public void goUp(){
         updateImage("SpaceshipBoost.png");
         setTranslateY(3);
-        //getSprite().setRotation(0);
     }
 
     public void goDown(){
         updateImage("SpaceshipBoost.png");
         setTranslateY(-3);
-        //getSprite().setRotation(180);
     }
 
     public void goLeft(){
         updateImage("SpaceshipBoost.png");
         setTranslateX(-3);
-        //getSprite().setRotation(90);
     }
 
     public void goRight(){
         updateImage("SpaceshipBoost.png");
         setTranslateX(3);
-        //getSprite().setRotation(-90);
     }
 
     public void stop(){

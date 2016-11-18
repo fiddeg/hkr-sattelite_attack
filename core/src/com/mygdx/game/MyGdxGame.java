@@ -16,9 +16,8 @@ public class MyGdxGame extends ApplicationAdapter {
 	private Spaceship spaceship;
 	private ArrayList<Bullet> bulletList = new ArrayList<Bullet>();
 	private ArrayList<Bullet> tempDispose = new ArrayList<Bullet>();
-	private float timer, deltaTimer;
 	private Shield shield;
-
+	private Cannon cannon;
 
 	@Override
 	public void create () {
@@ -26,6 +25,8 @@ public class MyGdxGame extends ApplicationAdapter {
 		img = new Texture("spaceBack.jpg");
 		createSpaceShip();
 		createShield();
+		//Nikolaj cannon
+		createCannon();
 	}
 
 	private void createSpaceShip(){
@@ -36,8 +37,17 @@ public class MyGdxGame extends ApplicationAdapter {
 		shield = new Shield("shield.png", spaceship.getX()-10, spaceship.getY()-10, 60, 60);
 	}
 
+    //Nikolaj cannon - lägg in bild för cannon ist för shield
+	private void createCannon(){
+		cannon = new Cannon("cannon.png", spaceship.getX()-15, spaceship.getY()-15, 10, 22);
+	}
 
 	public void checkInput() {
+
+        /**
+         * If-statement för att röra skeppet i olika riktningar.
+         * / Fredrik
+         */
 		if (Gdx.input.isKeyPressed(Input.Keys.W)){
 			spaceship.goUp();
 			spaceship.setRotation(0);
@@ -87,43 +97,52 @@ public class MyGdxGame extends ApplicationAdapter {
 			}
 		}
 
+		//Nikolaj cannon
+        if (Gdx.input.isKeyJustPressed(Input.Keys.O)){
+            cannon.rotateLeft();
+        }
+        else if (Gdx.input.isKeyJustPressed(Input.Keys.P)){
+            cannon.rotateRight();
+        }
+
+        /**
+         * För att skjuta skott med Spacebar.
+         * / Fredrik
+         */
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            createBulletCannon();
+        }
+
 	}
 
-	public void createBullet(){
-		if (spaceship.getRotation() == 0){
-			bulletList.add(new Bullet(spaceship.getX()+(spaceship.getWidth()/2)-2, spaceship.getY()+(spaceship.getHeight())-2, spaceship.getRotation(), (spaceship.getRotation() * (float)Math.PI / -180)));
-		}
-		else if (spaceship.getRotation() == 90){
-			bulletList.add(new Bullet(spaceship.getX()-5, spaceship.getY()+(spaceship.getHeight()/2)-7, spaceship.getRotation(), (spaceship.getRotation() * (float)Math.PI / -180)));
-		}
-		else if (spaceship.getRotation() == -90){
-			bulletList.add(new Bullet(spaceship.getX()+(spaceship.getWidth()+4), spaceship.getY()+(spaceship.getHeight()/2)-7, spaceship.getRotation(), (spaceship.getRotation() * (float)Math.PI / -180)));
-		}
-		else if (spaceship.getRotation() == 45){
-			bulletList.add(new Bullet(spaceship.getX()-3, spaceship.getY()+34, spaceship.getRotation(), (spaceship.getRotation() * (float)Math.PI / -180)));
-		}
-		else if (spaceship.getRotation() == -45){
-			bulletList.add(new Bullet(spaceship.getX()+(spaceship.getWidth()-2), spaceship.getY()+(spaceship.getHeight()-6), spaceship.getRotation(), (spaceship.getRotation() * (float)Math.PI / -180)));
-		}
-		else if (spaceship.getRotation() == 135){
-			bulletList.add(new Bullet(spaceship.getX()+1, spaceship.getY()-5, spaceship.getRotation(), (spaceship.getRotation() * (float)Math.PI / -180)));
-		}
-		else if (spaceship.getRotation() == -135){
-			bulletList.add(new Bullet(spaceship.getX()+(spaceship.getWidth()-4), spaceship.getY()-6, spaceship.getRotation(), (spaceship.getRotation() * (float)Math.PI / -180)));
-		}
-		else if (spaceship.getRotation() == 180){
-			bulletList.add(new Bullet(spaceship.getX()+(spaceship.getWidth()/2)-2, spaceship.getY()-14, spaceship.getRotation(), (spaceship.getRotation() * (float)Math.PI / -180)));
-		}
-		//bulletList.add(new Bullet(spaceship.getX()+(spaceship.getWidth()/2)-2, spaceship.getY()+(spaceship.getHeight()/2)-2, spaceship.getRotation(), (spaceship.getRotation() * (float)Math.PI / -180)));
+	public void createBulletCannon(){
+        if (cannon.getRotation() == 0){ //Done
+            bulletList.add(new Bullet(cannon.getX()+2 , cannon.getY()+23, cannon.getRotation(), (cannon.getRotation() * (float)Math.PI / -180)));
+        } else if (cannon.getRotation() == 90){ //Done
+            bulletList.add(new Bullet(cannon.getX()-19, cannon.getY()-1, cannon.getRotation(), (cannon.getRotation() * (float)Math.PI / -180)));
+        } else if (cannon.getRotation() == -90){ //Done
+            bulletList.add(new Bullet(cannon.getX()+25, cannon.getY()-1, cannon.getRotation(), (cannon.getRotation() * (float)Math.PI / -180)));
+        } else if (cannon.getRotation() == 45){ //Done
+            bulletList.add(new Bullet(cannon.getX()-13, cannon.getY()+15, cannon.getRotation(), (cannon.getRotation() * (float)Math.PI / -180)));
+        } else if (cannon.getRotation() == -45){ //Done
+            bulletList.add(new Bullet(cannon.getX()+18, cannon.getY()+14, cannon.getRotation(), (cannon.getRotation() * (float)Math.PI / -180)));
+        } else if (cannon.getRotation() == 135){ //Done
+            bulletList.add(new Bullet(cannon.getX()-13, cannon.getY()-19, cannon.getRotation(), (cannon.getRotation() * (float)Math.PI / -180)));
+        } else if (cannon.getRotation() == -135){
+            bulletList.add(new Bullet(cannon.getX()+20, cannon.getY()-18, cannon.getRotation(), (cannon.getRotation() * (float)Math.PI / -180)));
+        } else if (cannon.getRotation() == 180){ //Done
+            bulletList.add(new Bullet(cannon.getX()+4, cannon.getY()-25, cannon.getRotation(), (cannon.getRotation() * (float)Math.PI / -180)));
+        }
 	}
 
 
 	@Override
-	public void render () {
+	public void render() {
 
 		checkInput();
 		spaceship.updatePositionFromSpeed();
 		shield.updatePositionFromSpaceship(spaceship.getX(), spaceship.getY(), Gdx.graphics.getDeltaTime());
+		cannon.updatePositionFromSpaceship(spaceship.getX(), spaceship.getY());
 
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -132,6 +151,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		batch.draw(img, 0, 0);
 		spaceship.draw(batch);
 		shield.draw(batch);
+		cannon.draw(batch);
 
 		if (spaceship.getSpeedY() == 0 && spaceship.getSpeedX() == 0){
 			spaceship.updateImage("Spaceship.png");
@@ -160,9 +180,6 @@ public class MyGdxGame extends ApplicationAdapter {
 			tempDispose.remove(0);
 		}
 
-		if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-			createBullet();
-		}
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)){
 			shield.isHit();
