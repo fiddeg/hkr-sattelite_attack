@@ -9,8 +9,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  * Created by Fidde on 2016-11-08.
  */
 public class Figure {
-    private int speedX = 0;
-    private int speedY = 0;
+    private float speedX = 0;
+    private float speedY = 0;
     private Sprite sprite;
 
     public Figure(String textureFileName, float x, float y, int sizeX, int sizeY){
@@ -61,19 +61,19 @@ public class Figure {
         sprite.setY(y);
     }
 
-    public int getSpeedX() {
+    public float getSpeedX() {
         return speedX;
     }
 
-    public void setSpeedX(int xSpeed) {
+    public void setSpeedX(float xSpeed) {
         this.speedX = xSpeed;
     }
 
-    public int getSpeedY() {
+    public float getSpeedY() {
         return speedY;
     }
 
-    public void setSpeedY(int ySpeed) {
+    public void setSpeedY(float ySpeed) {
         this.speedY = ySpeed;
     }
 

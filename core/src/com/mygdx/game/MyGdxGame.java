@@ -18,6 +18,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	private ArrayList<Bullet> tempDispose = new ArrayList<Bullet>();
 	private Shield shield;
 	private Cannon cannon;
+	private Asteroid asteroid;
 
 	@Override
 	public void create () {
@@ -27,6 +28,8 @@ public class MyGdxGame extends ApplicationAdapter {
 		createShield();
 		//Nikolaj cannon
 		createCannon();
+		asteroid = new Asteroid("asteroid.png", 100, 200, 60, 60);
+
 	}
 
 	private void createSpaceShip(){
@@ -143,6 +146,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		spaceship.updatePositionFromSpeed();
 		shield.updatePositionFromSpaceship(spaceship.getX(), spaceship.getY(), Gdx.graphics.getDeltaTime());
 		cannon.updatePositionFromSpaceship(spaceship.getX(), spaceship.getY());
+		asteroid.updatePositionFromSpeed();
 
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -152,6 +156,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		spaceship.draw(batch);
 		shield.draw(batch);
 		cannon.draw(batch);
+		asteroid.draw(batch);
 
 		if (spaceship.getSpeedY() == 0 && spaceship.getSpeedX() == 0){
 			spaceship.updateImage("Spaceship.png");
