@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class MyGdxGame extends ApplicationAdapter {
 	private SpriteBatch batch;
@@ -19,6 +20,9 @@ public class MyGdxGame extends ApplicationAdapter {
 	private Shield shield;
 	private Cannon cannon;
 	private Asteroid asteroid;
+    private ArrayList<Asteroid> asteroidList = new ArrayList<Asteroid>();
+	private ArrayList<Asteroid> disposeAsteroidList = new ArrayList<Asteroid>();
+	private int countAsteroid = 0;
 
 	@Override
 	public void create () {
@@ -28,7 +32,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		createShield();
 		//Nikolaj cannon
 		createCannon();
-		asteroid = new Asteroid("asteroid.png", 100, 200, 60, 60);
+		spawnAsteroid();
 
 	}
 
@@ -116,6 +120,12 @@ public class MyGdxGame extends ApplicationAdapter {
             createBulletCannon();
         }
 
+		if (Gdx.input.isKeyJustPressed(Input.Keys.B)) {
+			asteroid.hit();
+		}
+
+
+
 	}
 
 	public void createBulletCannon(){
@@ -146,7 +156,27 @@ public class MyGdxGame extends ApplicationAdapter {
 		spaceship.updatePositionFromSpeed();
 		shield.updatePositionFromSpaceship(spaceship.getX(), spaceship.getY(), Gdx.graphics.getDeltaTime());
 		cannon.updatePositionFromSpaceship(spaceship.getX(), spaceship.getY());
-		asteroid.updatePositionFromSpeed();
+		//asteroid.updatePositionFromSpeed();
+
+		for (Asteroid asteroid : asteroidList) {
+			asteroid.updatePositionFromSpeed();
+			for (Bullet bullet : bulletList){
+				if (asteroid.collidesWith(bullet.getCollisionRectangle())) {
+					asteroid.hit();
+					bullet.hit();
+					countAsteroid--;
+					break;
+				}
+			}
+			if (asteroid.isHit()){
+				//disposeAsteroidList.add(asteroid);
+				asteroidList.remove(asteroid);
+				break;
+			}
+
+		}
+		spawnNewAsteroid();
+
 
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -154,9 +184,14 @@ public class MyGdxGame extends ApplicationAdapter {
 		batch.begin();
 		batch.draw(img, 0, 0);
 		spaceship.draw(batch);
-		shield.draw(batch);
 		cannon.draw(batch);
-		asteroid.draw(batch);
+        for (Asteroid asteroid : asteroidList){
+            asteroid.draw(batch);
+        }
+		for (Bullet bullet : bulletList) {
+			bullet.draw(batch);
+		}
+		//asteroid.draw(batch);
 
 		if (spaceship.getSpeedY() == 0 && spaceship.getSpeedX() == 0){
 			spaceship.updateImage("Spaceship.png");
@@ -164,11 +199,6 @@ public class MyGdxGame extends ApplicationAdapter {
 		else {
 			spaceship.updateImage("SpaceshipBoost.png");
 		}
-
-		for (Bullet bullet : bulletList) {
-			bullet.draw(batch);
-		}
-
 
 
 		batch.end();
@@ -192,10 +222,75 @@ public class MyGdxGame extends ApplicationAdapter {
 	}
 
 	@Override
-	public void dispose () {
+	public void dispose(){
 		batch.dispose();
 		img.dispose();
 	}
+
+	public int randomX(){
+
+        Random spawn = new Random();
+        int rngX = (spawn.nextInt(Gdx.graphics.getWidth()-60));
+        //int rngY = (spawn.nextInt(Gdx.graphics.getHeight()));
+
+        while((float) rngX > spaceship.getX()-100 && (float) rngX < spaceship.getX()+100) {
+            rngX = (spawn.nextInt(Gdx.graphics.getWidth()-60));
+        }
+        /**
+        while((float) rngY > spaceship.getY()-100 + spaceship.getY()+100) {
+            rngY = (spawn.nextInt(Gdx.graphics.getHeight()));
+        }
+         **/
+        return rngX;
+    }
+
+    public int randomY(){
+
+        Random spawn = new Random();
+        //int rngX = (spawn.nextInt(Gdx.graphics.getWidth()));
+        int rngY = (spawn.nextInt(Gdx.graphics.getHeight()-60));
+
+        /**
+        while((float) rngX > spaceship.getX()-100 + spaceship.getX()+100) {
+            rngX = (spawn.nextInt(Gdx.graphics.getWidth()));
+        }
+         **/
+        while((float) rngY > spaceship.getY()-100 && (float) rngY < spaceship.getY()+100) {
+            rngY = (spawn.nextInt(Gdx.graphics.getHeight()-60));
+        }
+        return rngY;
+    }
+
+	public void spawnAsteroid() {
+		/**
+	    Random spawn = new Random();
+		int rngX = (spawn.nextInt(Gdx.graphics.getWidth()));
+		int rngY = (spawn.nextInt(Gdx.graphics.getHeight()));
+         **/
+
+		while (countAsteroid <= 10){
+			int rngX = randomX();
+			int rngY = randomY();
+			asteroid = new Asteroid("asteroid.png", rngX, rngY, 60, 60);
+
+			asteroidList.add(asteroid);
+			countAsteroid++;
+		}
+
+	}
+
+	public void spawnNewAsteroid(){
+		if (countAsteroid <= 10){
+			int rngX = randomX();
+			int rngY = randomY();
+			asteroid = new Asteroid("asteroid.png", rngX, rngY, 60, 60);
+
+			asteroidList.add(asteroid);
+			countAsteroid++;
+		}
+
+	}
+
 }
 
 

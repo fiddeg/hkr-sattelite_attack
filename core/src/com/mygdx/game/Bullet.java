@@ -91,11 +91,20 @@ public class Bullet {
         sprite.draw(batch);
     }
 
+    public void hit(){
+        time = 0;
+    }
+
     public boolean isTimeout(){
         if (time < 0){
             return true;
         }
         return false;
+
+    }
+
+    public Rectangle getCollisionRectangle(){
+        return sprite.getBoundingRectangle();
 
     }
 }
