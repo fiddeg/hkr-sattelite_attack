@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class MyGdxGame extends ApplicationAdapter {
+
 	private SpriteBatch batch;
 	private Texture img;
 	private Spaceship spaceship;
@@ -20,10 +21,14 @@ public class MyGdxGame extends ApplicationAdapter {
 	private Shield shield;
 	private Cannon cannon;
 	private Asteroid asteroid;
+	private MagneticAsteroid magneticAsteroid;
     private ArrayList<Asteroid> asteroidList = new ArrayList<Asteroid>();
 	private ArrayList<Asteroid> disposeAsteroidList = new ArrayList<Asteroid>();
-	private int countAsteroid = 0;
+    private ArrayList<MagneticAsteroid> magneticAsteroidList = new ArrayList<MagneticAsteroid>();
+    private ArrayList<MagneticAsteroid> disposeMagneticAsteroidList = new ArrayList<MagneticAsteroid>();
 
+    private int countAsteroid = 0;
+    private int countMagneticAsteroid = 0;
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
@@ -33,12 +38,15 @@ public class MyGdxGame extends ApplicationAdapter {
 		//Nikolaj cannon
 		createCannon();
 		spawnAsteroid();
+        spawnMagneticAsteroid();
+
 
 	}
 
 	private void createSpaceShip(){
 		spaceship = new Spaceship("Spaceship.png", Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, 40, 40);
 	}
+
 
 	private void createShield(){
 		shield = new Shield("shield.png", spaceship.getX()-10, spaceship.getY()-10, 60, 60);
@@ -175,7 +183,31 @@ public class MyGdxGame extends ApplicationAdapter {
 			}
 
 		}
+
+        for (MagneticAsteroid magneticAsteroid : magneticAsteroidList) {
+
+
+            magneticAsteroid.updatePositionFromSpeed();
+
+            for (Bullet bullet : bulletList) {
+                if (magneticAsteroid.collidesWith(bullet.getCollisionRectangle())) {
+                    magneticAsteroid.hit();
+                    bullet.hit();
+                    countMagneticAsteroid--;
+                    break;
+                }
+            }
+
+            if (magneticAsteroid.isHit()) {
+                //disposeAsteroidList.add(asteroid);
+                magneticAsteroidList.remove(magneticAsteroid);
+                break;
+            }
+
+        }
 		spawnNewAsteroid();
+        spawnNewMagneticAsteroid();
+
 
 
 		Gdx.gl.glClearColor(1, 0, 0, 1);
@@ -183,17 +215,40 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		batch.begin();
 		batch.draw(img, 0, 0);
+        shield.draw(batch);
 		spaceship.draw(batch);
 		cannon.draw(batch);
         for (Asteroid asteroid : asteroidList){
             asteroid.draw(batch);
         }
+
+        for (MagneticAsteroid magneticAsteroid : magneticAsteroidList){
+            magneticAsteroid.draw(batch);
+        }
 		for (Bullet bullet : bulletList) {
 			bullet.draw(batch);
 		}
 		//asteroid.draw(batch);
+        for (Asteroid asteroid : asteroidList) {
+            if (shield.collidesWith(asteroid.getCollisionRectangle())) {
+                shield.isHit();
+                asteroid.hit();
+                countAsteroid--;
+                break;
+            }
+        }
+        for (MagneticAsteroid magneticAsteroid : magneticAsteroidList) {
+            if (shield.collidesWith(magneticAsteroid.getCollisionRectangle())) {
+                shield.isHit();
+                magneticAsteroid.hit();
+                countMagneticAsteroid--;
+                break;
+            }
+        }
 
-		if (spaceship.getSpeedY() == 0 && spaceship.getSpeedX() == 0){
+
+
+        if (spaceship.getSpeedY() == 0 && spaceship.getSpeedX() == 0){
 			spaceship.updateImage("Spaceship.png");
 		}
 		else {
@@ -261,24 +316,37 @@ public class MyGdxGame extends ApplicationAdapter {
         return rngY;
     }
 
-	public void spawnAsteroid() {
-		/**
-	    Random spawn = new Random();
-		int rngX = (spawn.nextInt(Gdx.graphics.getWidth()));
-		int rngY = (spawn.nextInt(Gdx.graphics.getHeight()));
-         **/
 
-		while (countAsteroid <= 10){
+    public void spawnMagneticAsteroid() {
+        while (countMagneticAsteroid <= 10) {
+            int rngX = randomX();
+            int rngY = randomY();
+
+            magneticAsteroid = new MagneticAsteroid("meteorBrown_big4.png", rngX, rngY, 60, 60, 1, 1);
+
+
+            magneticAsteroidList.add(magneticAsteroid);
+
+            countMagneticAsteroid++;
+
+        }
+    }
+	public void spawnAsteroid() {
+
+        while (countAsteroid <= 10){
 			int rngX = randomX();
 			int rngY = randomY();
+
 			asteroid = new Asteroid("asteroid.png", rngX, rngY, 60, 60);
 
-			asteroidList.add(asteroid);
-			countAsteroid++;
+
+            asteroidList.add(asteroid);
+
+            countAsteroid++;
+
 		}
 
 	}
-
 	public void spawnNewAsteroid(){
 		if (countAsteroid <= 10){
 			int rngX = randomX();
@@ -289,7 +357,29 @@ public class MyGdxGame extends ApplicationAdapter {
 			countAsteroid++;
 		}
 
+
 	}
+
+    public void spawnNewMagneticAsteroid() {
+        if (countMagneticAsteroid <= 10) {
+            int rngX2 = randomX();
+            int rngY2 = randomY();
+            float magneticAsteroidX = rngX2;
+            float magneticAsteroidY = rngY2;
+            float dx = spaceship.getX() - rngX2;
+            float dy = spaceship.getY() - rngY2;
+            float angle = (float) Math.atan2( dy, dx );
+            float speedX = (float) (5 * Math.cos( angle ));
+            float speedY = (float) (5 * Math.sin( angle ));
+            magneticAsteroidX += speedX;
+            magneticAsteroidY += speedY;
+
+            magneticAsteroid = new MagneticAsteroid("meteorBrown_big4.png", magneticAsteroidX, magneticAsteroidY, 60, 60, speedX, speedY);
+
+            magneticAsteroidList.add(magneticAsteroid);
+            countMagneticAsteroid++;
+        }
+    }
 
 }
 
