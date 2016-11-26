@@ -16,10 +16,8 @@ public class Bullet {
     private float a, time, angle, deltaTimer;
     private Texture picture;
 
-    public Bullet(float positionX, float positionY, float angle, float direction){
-        //bullet = new Rectangle(positionX, positionY, 4, 14);
-        //picture = new Texture("bullet.png");
-        sprite = new Sprite(new Texture("bullet.png"));
+    public Bullet(String texture,float positionX, float positionY, float angle, float direction){
+        sprite = new Sprite(new Texture(texture));
         sprite.setSize(4, 14);
         sprite.setX(positionX);
         sprite.setY(positionY);
