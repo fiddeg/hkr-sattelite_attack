@@ -225,6 +225,25 @@ public class MyGdxGame extends ApplicationAdapter {
         shield.draw(batch);
 		spaceship.draw(batch);
 		cannon.draw(batch);
+		for(int i = 0; i < magneticAsteroidList.size(); i++) {
+			if (spaceship.getBounds().contains(magneticAsteroidList.get(i).getX(),
+					magneticAsteroidList.get(i).getY())) {
+				float rngX2 = magneticAsteroid.getX();
+				float rngY2 = magneticAsteroid.getY();
+				float magneticAsteroidX = rngX2;
+				float magneticAsteroidY = rngY2;
+				float dx = spaceship.getX() - rngX2;
+				float dy = spaceship.getY() - rngY2;
+				float angle = (float) Math.atan2(dy, dx);
+				float speedX = (float) (5 * Math.cos(angle));
+				float speedY = (float) (5 * Math.sin(angle));
+				magneticAsteroidX += speedX;
+				magneticAsteroidY += speedY;
+				magneticAsteroid.setX(magneticAsteroidX);
+				magneticAsteroid.setY(magneticAsteroidY);
+				magneticAsteroid.setSpeedX(speedX);
+			magneticAsteroid.setSpeedY(speedY);        }
+		}
         for (Asteroid asteroid : asteroidList){
             asteroid.draw(batch);
         }
@@ -341,7 +360,7 @@ public class MyGdxGame extends ApplicationAdapter {
             int rngX = randomX();
             int rngY = randomY();
 
-            magneticAsteroid = new MagneticAsteroid("meteorBrown_big4.png", rngX, rngY, 60, 60, 1, 1);
+            magneticAsteroid = new MagneticAsteroid("meteorBrown_big4.png", rngX, rngY, 60, 60);
 
 
             magneticAsteroidList.add(magneticAsteroid);
@@ -380,24 +399,14 @@ public class MyGdxGame extends ApplicationAdapter {
 	}
 
     public void spawnNewMagneticAsteroid() {
-        if (countMagneticAsteroid <= 10) {
-            int rngX2 = randomX();
-            int rngY2 = randomY();
-            float magneticAsteroidX = rngX2;
-            float magneticAsteroidY = rngY2;
-            float dx = spaceship.getX() - rngX2;
-            float dy = spaceship.getY() - rngY2;
-            float angle = (float) Math.atan2( dy, dx );
-            float speedX = (float) (5 * Math.cos( angle ));
-            float speedY = (float) (5 * Math.sin( angle ));
-            magneticAsteroidX += speedX;
-            magneticAsteroidY += speedY;
+		if (countMagneticAsteroid <= 10){
+			int rngX = randomX();
+			int rngY = randomY();
+			magneticAsteroid = new MagneticAsteroid("meteorBrown_big4.png", rngX, rngY, 60, 60);
 
-            magneticAsteroid = new MagneticAsteroid("meteorBrown_big4.png", magneticAsteroidX, magneticAsteroidY, 60, 60, speedX, speedY);
-
-            magneticAsteroidList.add(magneticAsteroid);
-            countMagneticAsteroid++;
-        }
+			magneticAsteroidList.add(magneticAsteroid);
+			countMagneticAsteroid++;
+		}
     }
 
 	public void randomSatellite(){

@@ -12,11 +12,9 @@ public class MagneticAsteroid extends Figure {
     private boolean isHit = false;
 
     //timecounter makes it update the position every 60 frames instead of each frame//
-    public MagneticAsteroid(String textureFileName, float x, float y, int sizeX, int sizeY, float speedX, float speedY) {
+    public MagneticAsteroid(String textureFileName, float x, float y, int sizeX, int sizeY) {
         super(textureFileName, x, y, sizeX, sizeY);
 
-        setSpeedX(speedX);
-        setSpeedY(speedY);
     }
     public void updatePositionFromSpeed(){
         super.updatePositionFromSpeed();
@@ -53,23 +51,6 @@ public class MagneticAsteroid extends Figure {
         setSpeedY(rngY);
     }
 
-    public void rngDirectionAttack(float spaceShipX, float spaceShipY, float asteroidX, float asteroidY) {
-        float rngX2 = asteroidX;
-        float rngY2 = asteroidY;
-        float magneticAsteroidX = rngX2;
-        float magneticAsteroidY = rngY2;
-        float dx = spaceShipX - rngX2;
-        float dy = spaceShipY - rngY2;
-        float angle = (float) Math.atan2( dy, dx );
-        float speedX = (float) (5 * Math.cos( angle ));
-        float speedY = (float) (5 * Math.sin( angle ));
-        magneticAsteroidX += speedX;
-        magneticAsteroidY += speedY;
-
-        setSpeedX(magneticAsteroidX);
-        setSpeedY(magneticAsteroidY);
-
-    }
 
 
     public boolean isHit(){

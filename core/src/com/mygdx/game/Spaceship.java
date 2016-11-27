@@ -1,5 +1,7 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.math.Rectangle;
+
 /**
  * Created by Fidde on 2016-11-08.
  */
@@ -14,6 +16,8 @@ public class Spaceship extends Figure{
         super.updatePositionFromSpeed();
         stopAtEdge();
     }
+
+    public Rectangle getBounds(){    return new Rectangle(getX()+100, getY()+100, getWidth()+50, getHeight()+50);}
 
     public void setRotation(float degree){
         getSprite().setRotation(degree);
