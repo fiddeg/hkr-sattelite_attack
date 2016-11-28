@@ -210,8 +210,8 @@ public class MyGdxGame extends ApplicationAdapter {
                 magneticAsteroidList.remove(magneticAsteroid);
                 break;
             }
-
         }
+
 		spawnNewAsteroid();
         spawnNewMagneticAsteroid();
 
@@ -247,6 +247,19 @@ public class MyGdxGame extends ApplicationAdapter {
                 break;
             }
         }
+
+        for (Satellite satellite : satelliteList){
+			for (Bullet bullet : bulletList) {
+				if (bullet instanceof SpaceshipBullet) {
+					if (satellite.collidesWith(bullet.getCollisionRectangle())) {
+						satellite.hit();
+						bullet.hit();
+						break;
+					}
+				}
+			}
+		}
+
         for (MagneticAsteroid magneticAsteroid : magneticAsteroidList) {
             if (shield.collidesWith(magneticAsteroid.getCollisionRectangle())) {
                 shield.isHit();
@@ -284,7 +297,7 @@ public class MyGdxGame extends ApplicationAdapter {
 			if (satellite.shoot()){
 				satelliteShoot();
 			}
-			if (satellite.isTimeout()){
+			if (satellite.isTimeout() || satellite.isHit()){
 				satelliteList.remove(satellite);
 				break;
 			}
@@ -295,6 +308,7 @@ public class MyGdxGame extends ApplicationAdapter {
 			shield.isHit();
 		}
 	}
+
 
 	@Override
 	public void dispose(){
