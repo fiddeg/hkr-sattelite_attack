@@ -114,4 +114,12 @@ public class Satellite extends Figure{
         return false;
     }
 
+    public boolean isHit(){
+        return isHit;
+    }
+
+    public void hit(){
+        isHit = true;
+    }
+
 }
