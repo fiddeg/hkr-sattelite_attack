@@ -33,7 +33,9 @@ public class MyGdxGame extends ApplicationAdapter {
 	private Asteroid asteroid;
 	private MagneticAsteroid magneticAsteroid;
     private ArrayList<Asteroid> asteroidList = new ArrayList<Asteroid>();
+	private ArrayList<Asteroid> disposeAsteroidList = new ArrayList<Asteroid>();
     private ArrayList<MagneticAsteroid> magneticAsteroidList = new ArrayList<MagneticAsteroid>();
+    private ArrayList<MagneticAsteroid> disposeMagneticAsteroidList = new ArrayList<MagneticAsteroid>();
 	private ArrayList<Satellite> satelliteList = new ArrayList<Satellite>();
 
     private int countAsteroid = 0;
@@ -168,149 +170,16 @@ public class MyGdxGame extends ApplicationAdapter {
 	@Override
 	public void render() {
 
-<<<<<<< HEAD
-
 		if (gameState == GameState.LEVEL_1) {
 			level1();
-=======
-		checkInput();
-		spaceship.updatePositionFromSpeed();
-		shield.updatePositionFromSpaceship(spaceship.getX(), spaceship.getY(), Gdx.graphics.getDeltaTime());
-		cannon.updatePositionFromSpaceship(spaceship.getX(), spaceship.getY());
-
-		for (Asteroid asteroid : asteroidList) {
-			asteroid.updatePositionFromSpeed();
-			for (Bullet bullet : bulletList){
-				if (asteroid.collidesWith(bullet.getCollisionRectangle())) {
-					if (bullet instanceof SpaceshipBullet){
-						asteroid.hit();
-						bullet.hit();
-						countAsteroid--;
-						break;
-					}
-
-				}
-				if (bullet instanceof SatelliteBullet){
-					if (shield.collidesWith(bullet.getCollisionRectangle())){
-						shield.isHit();
-						bullet.hit();
-						break;
-					}
-				}
-
-			}
-			if (asteroid.isHit()){
-				asteroidList.remove(asteroid);
-				break;
-			}
-
-		}
-        for (MagneticAsteroid magneticAsteroid : magneticAsteroidList) {
-            magneticAsteroid.updatePositionFromSpeed();
-
-            for (Bullet bullet : bulletList) {
-                if (magneticAsteroid.collidesWith(bullet.getCollisionRectangle())) {
-					if (bullet instanceof SpaceshipBullet){
-						magneticAsteroid.hit();
-						bullet.hit();
-						countMagneticAsteroid--;
-						break;
-					}
-                }
-            }
-
-            if (magneticAsteroid.isHit()) {
-                //disposeAsteroidList.add(asteroid);
-                magneticAsteroidList.remove(magneticAsteroid);
-                break;
-            }
-        }
-
-		spawnNewAsteroid();
-        spawnNewMagneticAsteroid();
-
-
-
-		Gdx.gl.glClearColor(1, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-		batch.begin();
-		batch.draw(img, 0, 0);
-        shield.draw(batch);
-		spaceship.draw(batch);
-		cannon.draw(batch);
-		magneticAsteroid();
-        for (Asteroid asteroid : asteroidList){
-            asteroid.draw(batch);
-        }
-        for (MagneticAsteroid magneticAsteroid : magneticAsteroidList){
-            magneticAsteroid.draw(batch);
-        }
-		for (Bullet bullet : bulletList) {
-			bullet.draw(batch);
-		}
-		for (Satellite satellite : satelliteList){
-			satellite.draw(batch);
-		}
-		//asteroid.draw(batch);
-        for (Asteroid asteroid : asteroidList) {
-            if (shield.collidesWith(asteroid.getCollisionRectangle())) {
-                shield.isHit();
-                asteroid.hit();
-                countAsteroid--;
-                break;
-            }
-        }
-
-        for (Satellite satellite : satelliteList){
-			for (Bullet bullet : bulletList) {
-				if (bullet instanceof SpaceshipBullet) {
-					if (satellite.collidesWith(bullet.getCollisionRectangle())) {
-						satellite.hit();
-						bullet.hit();
-						break;
-					}
-				}
-			}
-		}
-
-        for (MagneticAsteroid magneticAsteroid : magneticAsteroidList) {
-            if (shield.collidesWith(magneticAsteroid.getCollisionRectangle())) {
-                shield.isHit();
-                magneticAsteroid.hit();
-                countMagneticAsteroid--;
-                break;
-            }
-        }
-
-
-
-        if (spaceship.getSpeedY() == 0 && spaceship.getSpeedX() == 0){
-			spaceship.updateImage("Spaceship.png");
->>>>>>> origin/master
 		}
 		else if (gameState == GameState.LEVEL_2){
 			level2();
 		}
-<<<<<<< HEAD
-		else if (gameState == GameState.LEVEL_COMPLETE_1){
+		else if (gameState == GameState.LEVEL_COMPLETE_1) {
 			level1Complete();
-=======
-
-		for (Satellite satellite : satelliteList){
-			satellite.updatePositionFromSpeed(Gdx.graphics.getDeltaTime());
-			if (satellite.shoot()){
-				satelliteShoot();
-			}
-			if (satellite.isTimeout() || satellite.isHit()){
-				satelliteList.remove(satellite);
-				break;
-			}
->>>>>>> origin/master
 		}
-
 	}
-
 
 	@Override
 	public void dispose(){
@@ -357,6 +226,7 @@ public class MyGdxGame extends ApplicationAdapter {
     public int randomY(){
 
         Random spawn = new Random();
+        //int rngX = (spawn.nextInt(Gdx.graphics.getWidth()));
         int rngY = (spawn.nextInt(Gdx.graphics.getHeight()-60));
 
         while((float) rngY > spaceship.getY()-100 && (float) rngY < spaceship.getY()+100) {
@@ -387,6 +257,8 @@ public class MyGdxGame extends ApplicationAdapter {
 			int rngY = randomY();
 
 			asteroid = new Asteroid("asteroid.png", rngX, rngY, 60, 60);
+
+
             asteroidList.add(asteroid);
 
             countAsteroid++;
@@ -403,6 +275,8 @@ public class MyGdxGame extends ApplicationAdapter {
 			asteroidList.add(asteroid);
 			countAsteroid++;
 		}
+
+
 	}
 
     public void spawnNewMagneticAsteroid() {
@@ -488,6 +362,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				bulletList.add(new SatelliteBullet("laserBlue02.png", satellite.getX()+20, satellite.getY()+20, angle2, angle));
 			}
 		}
+
 	}
 
 	public void level2(){

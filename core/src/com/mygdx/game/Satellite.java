@@ -16,12 +16,13 @@ public class Satellite extends Figure{
     public Satellite(String textureFileName, float x, float y, int sizeX, int sizeY){
         super(textureFileName, x, y, sizeX, sizeY);
 
-        rangeToShoot = (7 - 5) + 1;
+        rangeToShoot = (7 - 4) + 1;
         timeToShoot = (int)(Math.random() * rangeToShoot) +4;
 
         getSprite().setOriginCenter();
         RandomDirection();
         time = 10;
+        System.out.println(timeToShoot);
     }
 
     public void updatePositionFromSpeed(float deltaTime) {
