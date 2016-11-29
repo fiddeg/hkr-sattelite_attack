@@ -19,6 +19,7 @@ public class Asteroid extends Figure{
 
     public void updatePositionFromSpeed(){
         super.updatePositionFromSpeed();
+
         bounceAtEdge();
         timeCounter++;
 
