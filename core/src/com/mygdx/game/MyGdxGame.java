@@ -3,6 +3,8 @@ package com.mygdx.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -37,8 +39,13 @@ public class MyGdxGame extends ApplicationAdapter {
     private ArrayList<MagneticAsteroid> magneticAsteroidList = new ArrayList<MagneticAsteroid>();
     private ArrayList<MagneticAsteroid> disposeMagneticAsteroidList = new ArrayList<MagneticAsteroid>();
 	private ArrayList<Satellite> satelliteList = new ArrayList<Satellite>();
+	private Sound pew;
+	private Sound explosion;
+	private Sound satellitePew;
+	private Music backMusic;
 
-    private int countAsteroid = 0;
+
+	private int countAsteroid = 0;
     private int countMagneticAsteroid = 0;
 	private int score = 0;
 
@@ -47,6 +54,11 @@ public class MyGdxGame extends ApplicationAdapter {
 	public void create () {
 		batch = new SpriteBatch();
 		img = new Texture("spaceBack.jpg");
+		pew = Gdx.audio.newSound(Gdx.files.internal("sounds/pew.wav"));
+		explosion = Gdx.audio.newSound(Gdx.files.internal("sounds/explode.wav"));
+		satellitePew = Gdx.audio.newSound(Gdx.files.internal("sounds/satellitepew.wav"));
+		backMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/backmusic.mp3"));
+		backMusic.play();
 		createObjects();
 		spawnAsteroid();
         spawnMagneticAsteroid();
@@ -133,6 +145,7 @@ public class MyGdxGame extends ApplicationAdapter {
          */
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             createBulletCannon();
+			pew.play();
         }
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.CONTROL_RIGHT)){
@@ -185,6 +198,10 @@ public class MyGdxGame extends ApplicationAdapter {
 	public void dispose(){
 		batch.dispose();
 		img.dispose();
+		pew.dispose();
+		explosion.dispose();
+		satellitePew.dispose();
+		backMusic.dispose();
 	}
 
 	public void magneticAsteroid(){
@@ -349,6 +366,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				float radians = (float)Math.atan2(opposite2,adjacent2);
 				float angle2 = radians * (-180/(float)Math.PI);
 				bulletList.add(new SatelliteBullet("laserBlue02.png", satellite.getX()+20, satellite.getY()+20, angle2, angle));
+				satellitePew.play();
 
 			} else {
 				float opposite = satellite.getX()-spaceship.getX();
@@ -360,6 +378,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				float radians = (float)Math.atan2(opposite,adjacent);
 				float angle2 = radians * (-180/(float)Math.PI);
 				bulletList.add(new SatelliteBullet("laserBlue02.png", satellite.getX()+20, satellite.getY()+20, angle2, angle));
+				satellitePew.play();
 			}
 		}
 
@@ -379,6 +398,7 @@ public class MyGdxGame extends ApplicationAdapter {
 						asteroid.hit();
 						bullet.hit();
 						countAsteroid--;
+						explosion.play();
 						break;
 					}
 
@@ -407,6 +427,7 @@ public class MyGdxGame extends ApplicationAdapter {
 						magneticAsteroid.hit();
 						bullet.hit();
 						countMagneticAsteroid--;
+						explosion.play();
 						break;
 					}
 				}
@@ -451,6 +472,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				shield.isHit();
 				asteroid.hit();
 				countAsteroid--;
+				explosion.play();
 				break;
 			}
 		}
@@ -472,6 +494,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				shield.isHit();
 				magneticAsteroid.hit();
 				countMagneticAsteroid--;
+				explosion.play();
 				break;
 			}
 		}
@@ -531,6 +554,7 @@ public class MyGdxGame extends ApplicationAdapter {
 						asteroid.hit();
 						bullet.hit();
 						countAsteroid--;
+						explosion.play();
 						score++;
 						break;
 					}
@@ -580,6 +604,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				shield.isHit();
 				asteroid.hit();
 				countAsteroid--;
+				explosion.play();
 				score++;
 				break;
 			}
@@ -591,6 +616,7 @@ public class MyGdxGame extends ApplicationAdapter {
 					if (satellite.collidesWith(bullet.getCollisionRectangle())) {
 						satellite.hit();
 						bullet.hit();
+						explosion.play();
 						break;
 					}
 				}
