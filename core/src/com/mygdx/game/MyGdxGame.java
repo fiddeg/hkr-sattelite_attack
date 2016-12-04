@@ -7,7 +7,6 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.util.ArrayList;
@@ -324,7 +323,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				while (rngY < Gdx.graphics.getHeight()+40 && rngY > 0){
 					rngY = (spawn.nextInt(yMax + 1 + yMin) - yMin);
 				}
-				satelliteList.add(new Satellite("ufoBlue.png", rngX, rngY, 40, 40));
+				satelliteList.add(new Satellite("Satellite.png", rngX, rngY, 40, 40));
 				break;
 			case 2:
 				rngX = (spawn.nextInt(xMax + 1 + xMin) - xMin);
@@ -332,7 +331,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				while (rngX < Gdx.graphics.getWidth()+40 && rngX > 0){
 					rngX = (spawn.nextInt(xMax + 1 + xMin) - xMin);
 				}
-				satelliteList.add(new Satellite("ufoBlue.png", rngX, rngY, 40, 40));
+				satelliteList.add(new Satellite("Satellite.png.png", rngX, rngY, 40, 40));
 				break;
 			case 3:
 				rngX = (spawn.nextInt(xMax + 1 + xMin) - xMin);
@@ -340,7 +339,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				while (rngY < Gdx.graphics.getHeight()+40 && rngY > 0){
 					rngY = (int)(Math.random() * ((yMax -50) + 1)) - 50;
 				}
-				satelliteList.add(new Satellite("ufoBlue.png", rngX, rngY, 40, 40));
+				satelliteList.add(new Satellite("Satellite.png.png", rngX, rngY, 40, 40));
 				break;
 			case 4:
 				rngX = (int)(Math.random() * ((xMax -50) + 1)) - 50;
@@ -348,7 +347,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				while (rngX < Gdx.graphics.getWidth()+40 && rngX > 0){
 					rngX = (int)(Math.random() * ((xMax -50) + 1)) - 50;
 				}
-				satelliteList.add(new Satellite("ufoBlue.png", rngX, rngY, 40, 40));
+				satelliteList.add(new Satellite("Satellite.png.png", rngX, rngY, 40, 40));
 				break;
 
 		}
@@ -398,6 +397,7 @@ public class MyGdxGame extends ApplicationAdapter {
 						asteroid.hit();
 						bullet.hit();
 						countAsteroid--;
+                        score++;
 						explosion.play();
 						break;
 					}
@@ -426,6 +426,7 @@ public class MyGdxGame extends ApplicationAdapter {
 					if (bullet instanceof SpaceshipBullet){
 						magneticAsteroid.hit();
 						bullet.hit();
+                        score++;
 						countMagneticAsteroid--;
 						explosion.play();
 						break;
@@ -473,6 +474,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				asteroid.hit();
 				countAsteroid--;
 				explosion.play();
+                score++;
 				break;
 			}
 		}
@@ -483,6 +485,7 @@ public class MyGdxGame extends ApplicationAdapter {
 					if (satellite.collidesWith(bullet.getCollisionRectangle())) {
 						satellite.hit();
 						bullet.hit();
+                        score++;
 						break;
 					}
 				}
@@ -495,6 +498,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				magneticAsteroid.hit();
 				countMagneticAsteroid--;
 				explosion.play();
+                score++;
 				break;
 			}
 		}
@@ -657,7 +661,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		if (score == 10){
 			gameState = gameState.LEVEL_COMPLETE_1;
-			score = 0;
+			//score = 0;
 		}
 	}
 
