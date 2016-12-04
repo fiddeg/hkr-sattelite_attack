@@ -14,6 +14,7 @@ import java.util.Random;
 
 public class MyGdxGame extends ApplicationAdapter {
 
+
 	private enum GameState{
 		TITLE_SCREEN,
 		LEVEL_1,
@@ -42,6 +43,8 @@ public class MyGdxGame extends ApplicationAdapter {
 	private Sound explosion;
 	private Sound satellitePew;
 	private Music backMusic;
+    private int spawnAsteroidTimer;
+    private int timer;
 
 
 	private int countAsteroid = 0;
@@ -51,6 +54,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	@Override
 	public void create () {
+
 		batch = new SpriteBatch();
 		img = new Texture("spaceBack.jpg");
 		pew = Gdx.audio.newSound(Gdx.files.internal("sounds/pew.wav"));
@@ -253,9 +257,11 @@ public class MyGdxGame extends ApplicationAdapter {
 
 
     public void spawnMagneticAsteroid() {
+
         while (countMagneticAsteroid < 4) {
             int rngX = randomX();
             int rngY = randomY();
+
 
             magneticAsteroid = new MagneticAsteroid("meteorBrown_big4.png", rngX, rngY, 60, 60);
 
@@ -283,6 +289,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	}
 	public void spawnNewAsteroid(){
+
 		if (countAsteroid <= 10){
 			int rngX = randomX();
 			int rngY = randomY();
@@ -291,6 +298,8 @@ public class MyGdxGame extends ApplicationAdapter {
 			asteroidList.add(asteroid);
 			countAsteroid++;
 		}
+		timer = 0;
+
 
 
 	}
@@ -384,6 +393,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	}
 
 	public void level2(){
+
 		checkInput();
 		spaceship.updatePositionFromSpeed();
 		shield.updatePositionFromSpaceship(spaceship.getX(), spaceship.getY(), Gdx.graphics.getDeltaTime());
@@ -544,6 +554,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	}
 
 	public void level1(){
+        timer = timer +1;
 		checkInput();
 
 		spaceship.updatePositionFromSpeed();
@@ -560,6 +571,8 @@ public class MyGdxGame extends ApplicationAdapter {
 						countAsteroid--;
 						explosion.play();
 						score++;
+                        Random spawn = new Random();
+                        spawnAsteroidTimer = (spawn.nextInt(200));
 						break;
 					}
 
@@ -580,10 +593,11 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		}
 
-		spawnNewAsteroid();
+
 		spawnNewMagneticAsteroid();
-
-
+        if(timer > spawnAsteroidTimer) {
+            spawnNewAsteroid();
+        }
 
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -610,6 +624,8 @@ public class MyGdxGame extends ApplicationAdapter {
 				countAsteroid--;
 				explosion.play();
 				score++;
+                Random spawn = new Random();
+                spawnAsteroidTimer = (spawn.nextInt(200));
 				break;
 			}
 		}
