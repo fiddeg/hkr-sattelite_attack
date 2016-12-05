@@ -7,7 +7,6 @@ import com.badlogic.gdx.Gdx;
  */
 public class Satellite extends Figure{
     private boolean isHit = false;
-    Bullet bullet;
     private float time;
     private int rangeToShoot;
     private int timeToShoot;
@@ -23,6 +22,12 @@ public class Satellite extends Figure{
         RandomDirection();
         time = 10;
         System.out.println(timeToShoot);
+
+        float opposite = getSpeedX();
+        float adjacent = getSpeedY();
+        float radians = (float)Math.atan2(opposite,adjacent);
+        float angle = radians * (-180/(float)Math.PI);
+        getSprite().setRotation(angle);
     }
 
     public void updatePositionFromSpeed(float deltaTime) {

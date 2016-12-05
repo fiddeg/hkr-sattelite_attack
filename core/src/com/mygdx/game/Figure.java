@@ -86,6 +86,10 @@ public class Figure {
         return sprite;
     }
 
+    public void setRotation(float rotation){
+        sprite.setRotation(rotation);
+    }
+
     public void updatePositionFromSpeed(){
         if (getSpeedX()==0 && getSpeedY()==0)
             return;

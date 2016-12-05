@@ -7,13 +7,13 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 public class MyGdxGame extends ApplicationAdapter {
-
 
 	private enum GameState{
 		TITLE_SCREEN,
@@ -45,6 +45,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	private Music backMusic;
     private int spawnAsteroidTimer;
     private int timer;
+	private BitmapFont font;
 
 
 	private int countAsteroid = 0;
@@ -62,6 +63,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		satellitePew = Gdx.audio.newSound(Gdx.files.internal("sounds/satellitepew.wav"));
 		backMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/backmusic.mp3"));
 		backMusic.play();
+		font = new BitmapFont();
 		createObjects();
 		spawnAsteroid();
         spawnMagneticAsteroid();
@@ -262,9 +264,9 @@ public class MyGdxGame extends ApplicationAdapter {
             int rngX = randomX();
             int rngY = randomY();
 
+			int size = (int)(Math.random()* (70 - 35))+35;
 
-            magneticAsteroid = new MagneticAsteroid("meteorBrown_big4.png", rngX, rngY, 60, 60);
-
+            magneticAsteroid = new MagneticAsteroid("meteorBrown_big4.png", rngX, rngY, size, size);
 
             magneticAsteroidList.add(magneticAsteroid);
 
@@ -278,8 +280,9 @@ public class MyGdxGame extends ApplicationAdapter {
 			int rngX = randomX();
 			int rngY = randomY();
 
-			asteroid = new Asteroid("asteroid.png", rngX, rngY, 60, 60);
+			int size = (int)(Math.random()* (70 - 35))+35;
 
+			asteroid = new Asteroid("asteroid.png", rngX, rngY, size, size);
 
             asteroidList.add(asteroid);
 
@@ -293,7 +296,10 @@ public class MyGdxGame extends ApplicationAdapter {
 		if (countAsteroid <= 10){
 			int rngX = randomX();
 			int rngY = randomY();
-			asteroid = new Asteroid("asteroid.png", rngX, rngY, 60, 60);
+
+			int size = (int)(Math.random()* (70 - 35))+35;
+
+			asteroid = new Asteroid("asteroid.png", rngX, rngY, size, size);
 
 			asteroidList.add(asteroid);
 			countAsteroid++;
@@ -308,7 +314,10 @@ public class MyGdxGame extends ApplicationAdapter {
 		if (countMagneticAsteroid < 4){
 			int rngX = randomX();
 			int rngY = randomY();
-			magneticAsteroid = new MagneticAsteroid("meteorBrown_big4.png", rngX, rngY, 60, 60);
+
+			int size = (int)(Math.random()* (70 - 35))+35;
+
+			magneticAsteroid = new MagneticAsteroid("meteorBrown_big4.png", rngX, rngY, size, size);
 
 			magneticAsteroidList.add(magneticAsteroid);
 			countMagneticAsteroid++;
@@ -332,7 +341,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				while (rngY < Gdx.graphics.getHeight()+40 && rngY > 0){
 					rngY = (spawn.nextInt(yMax + 1 + yMin) - yMin);
 				}
-				satelliteList.add(new Satellite("Satellite.png", rngX, rngY, 40, 40));
+				satelliteList.add(new Satellite("Satellite.png", rngX, rngY, 55, 55));
 				break;
 			case 2:
 				rngX = (spawn.nextInt(xMax + 1 + xMin) - xMin);
@@ -340,7 +349,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				while (rngX < Gdx.graphics.getWidth()+40 && rngX > 0){
 					rngX = (spawn.nextInt(xMax + 1 + xMin) - xMin);
 				}
-				satelliteList.add(new Satellite("Satellite.png", rngX, rngY, 40, 40));
+				satelliteList.add(new Satellite("Satellite.png", rngX, rngY, 55, 55));
 				break;
 			case 3:
 				rngX = (spawn.nextInt(xMax + 1 + xMin) - xMin);
@@ -348,7 +357,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				while (rngY < Gdx.graphics.getHeight()+40 && rngY > 0){
 					rngY = (int)(Math.random() * ((yMax -50) + 1)) - 50;
 				}
-				satelliteList.add(new Satellite("Satellite.png", rngX, rngY, 40, 40));
+				satelliteList.add(new Satellite("Satellite.png", rngX, rngY, 55, 55));
 				break;
 			case 4:
 				rngX = (int)(Math.random() * ((xMax -50) + 1)) - 50;
@@ -356,7 +365,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				while (rngX < Gdx.graphics.getWidth()+40 && rngX > 0){
 					rngX = (int)(Math.random() * ((xMax -50) + 1)) - 50;
 				}
-				satelliteList.add(new Satellite("Satellite.png", rngX, rngY, 40, 40));
+				satelliteList.add(new Satellite("Satellite.png", rngX, rngY, 55, 55));
 				break;
 
 		}
@@ -367,9 +376,21 @@ public class MyGdxGame extends ApplicationAdapter {
 			if (satellite.getY() <= spaceship.getY()){
 				float opposite = satellite.getX()-spaceship.getX();
 				float adjacent = satellite.getY()-spaceship.getY();
+				if(adjacent == 0){
+					adjacent = 0.5f;
+				}
+				if (opposite == 0){
+					opposite = 0.5f;
+				}
 
 				float opposite2 = spaceship.getX()- satellite.getX();
 				float adjacent2 = spaceship.getY()- satellite.getY();
+				if(adjacent2 == 0){
+					adjacent = 0.5f;
+				}
+				if (opposite2 == 0){
+					opposite = 0.5f;
+				}
 				float angle = (float)Math.atan(opposite/adjacent);
 				float radians = (float)Math.atan2(opposite2,adjacent2);
 				float angle2 = radians * (-180/(float)Math.PI);
@@ -379,9 +400,21 @@ public class MyGdxGame extends ApplicationAdapter {
 			} else {
 				float opposite = satellite.getX()-spaceship.getX();
 				float adjacent = satellite.getY()-spaceship.getY();
+				if(adjacent == 0){
+					adjacent = 0.5f;
+				}
+				if (opposite == 0){
+					opposite = 0.5f;
+				}
 
 				float opposite2 = spaceship.getX()- satellite.getX();
 				float adjacent2 = spaceship.getY()- satellite.getY();
+				if(adjacent2 == 0){
+					adjacent = 0.5f;
+				}
+				if (opposite2 == 0){
+					opposite = 0.5f;
+				}
 				float angle = (float)Math.atan2(opposite2,adjacent2);
 				float radians = (float)Math.atan2(opposite,adjacent);
 				float angle2 = radians * (-180/(float)Math.PI);
@@ -461,6 +494,8 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		batch.begin();
 		batch.draw(img, 0, 0);
+		font.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+		font.draw(batch, Integer.toString(score), 20, 20);
 		shield.draw(batch);
 		spaceship.draw(batch);
 		cannon.draw(batch);
@@ -606,6 +641,8 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		batch.begin();
 		batch.draw(img, 0, 0);
+		font.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+		font.draw(batch, Integer.toString(score), 20, 20);
 		shield.draw(batch);
 		spaceship.draw(batch);
 		cannon.draw(batch);
