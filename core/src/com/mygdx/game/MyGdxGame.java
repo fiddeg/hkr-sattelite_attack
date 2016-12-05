@@ -340,7 +340,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				while (rngX < Gdx.graphics.getWidth()+40 && rngX > 0){
 					rngX = (spawn.nextInt(xMax + 1 + xMin) - xMin);
 				}
-				satelliteList.add(new Satellite("Satellite.png.png", rngX, rngY, 40, 40));
+				satelliteList.add(new Satellite("Satellite.png", rngX, rngY, 40, 40));
 				break;
 			case 3:
 				rngX = (spawn.nextInt(xMax + 1 + xMin) - xMin);
@@ -348,7 +348,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				while (rngY < Gdx.graphics.getHeight()+40 && rngY > 0){
 					rngY = (int)(Math.random() * ((yMax -50) + 1)) - 50;
 				}
-				satelliteList.add(new Satellite("Satellite.png.png", rngX, rngY, 40, 40));
+				satelliteList.add(new Satellite("Satellite.png", rngX, rngY, 40, 40));
 				break;
 			case 4:
 				rngX = (int)(Math.random() * ((xMax -50) + 1)) - 50;
@@ -356,7 +356,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				while (rngX < Gdx.graphics.getWidth()+40 && rngX > 0){
 					rngX = (int)(Math.random() * ((xMax -50) + 1)) - 50;
 				}
-				satelliteList.add(new Satellite("Satellite.png.png", rngX, rngY, 40, 40));
+				satelliteList.add(new Satellite("Satellite.png", rngX, rngY, 40, 40));
 				break;
 
 		}
@@ -560,6 +560,8 @@ public class MyGdxGame extends ApplicationAdapter {
 		spaceship.updatePositionFromSpeed();
 		shield.updatePositionFromSpaceship(spaceship.getX(), spaceship.getY(), Gdx.graphics.getDeltaTime());
 		cannon.updatePositionFromSpaceship(spaceship.getX(), spaceship.getY());
+
+
 
 		for (Asteroid asteroid : asteroidList) {
 			asteroid.updatePositionFromSpeed();
