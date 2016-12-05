@@ -8,6 +8,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		GAME_OVER
 	}
 
-	private GameState gameState = GameState.LEVEL_1;
+	private GameState gameState = GameState.TITLE_SCREEN;
 	private SpriteBatch batch;
 	private Texture img;
 	private Spaceship spaceship;
@@ -47,6 +48,10 @@ public class MyGdxGame extends ApplicationAdapter {
     private int spawnAsteroidTimer;
     private int timer;
 	private BitmapFont font;
+	private Music titleMusic;
+	private Sprite menuSprite;
+	private Texture menuTexture;
+	private int menuPos = 0;
 
 
 	private int countAsteroid = 0;
@@ -64,7 +69,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		explosion = Gdx.audio.newSound(Gdx.files.internal("sounds/explode.wav"));
 		satellitePew = Gdx.audio.newSound(Gdx.files.internal("sounds/satellitepew.wav"));
 		backMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/backmusic.mp3"));
-		backMusic.play();
+		titleMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/titlemusic.mp3"));
 		font = new BitmapFont();
 		createObjects();
 		spawnAsteroid();
@@ -194,7 +199,10 @@ public class MyGdxGame extends ApplicationAdapter {
 	@Override
 	public void render() {
 
-		if (gameState == GameState.LEVEL_1) {
+		if (gameState == GameState.TITLE_SCREEN) {
+			titleScreen();
+		}
+		else if (gameState == GameState.LEVEL_1) {
 			level1();
 		}
 		else if (gameState == GameState.LEVEL_2){
@@ -213,6 +221,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		explosion.dispose();
 		satellitePew.dispose();
 		backMusic.dispose();
+		titleMusic.dispose();
 	}
 
 	public void magneticAsteroid(){
@@ -432,6 +441,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	}
 
 	public void level2(){
+		backMusic.play();
         elapsedTime = Gdx.graphics.getDeltaTime();
 		checkInput();
 		spaceship.updatePositionFromSpeed();
@@ -601,6 +611,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	}
 
 	public void level1(){
+		backMusic.play();
         elapsedTime = Gdx.graphics.getDeltaTime();
         timer = timer +1;
 		checkInput();
@@ -757,6 +768,59 @@ public class MyGdxGame extends ApplicationAdapter {
 			img = new Texture("spaceBack.jpg");
 		}
 		batch.end();
+	}
+
+	private void titleScreen() {
+		titleMusic.play();
+
+		img = new Texture("menubg.png");
+		menuTexture = new Texture(Gdx.files.internal("menuarrow.png"));
+		menuSprite = new Sprite(menuTexture);
+
+		checkInputMenu();
+		updateArrowMenuPos();
+
+		batch.begin();
+		batch.draw(img, 0, 0);
+		menuSprite.draw(batch);
+
+
+		if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+			titleMusic.stop();
+			if (menuPos == 0) {
+				gameState = GameState.LEVEL_1;
+				img = new Texture("spaceBack.jpg");
+			}
+		}
+		batch.end();
+	}
+
+	public void checkInputMenu() {
+		if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+			menuPos--;
+		}else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+			menuPos++;
+		}
+
+	}
+
+	public void updateArrowMenuPos() {
+		if(menuPos > 3){
+			menuPos = 0;
+		}else if(menuPos < 0){
+			menuPos = 3;
+		}
+
+		if(menuPos == 0) {
+			menuSprite.setPosition(60,350);
+		}else if(menuPos == 1) {
+			menuSprite.setPosition(60,282);
+		}else if(menuPos == 2) {
+			menuSprite.setPosition(60,216);
+		}else if(menuPos == 3) {
+			menuSprite.setPosition(60,148);
+		}
+
 	}
 }
 
