@@ -11,14 +11,18 @@ public class Explosion{
     private static final int FRAME_COLS = 8;
     private static final int FRAME_ROWS = 6;
 
-    Texture explosionImg;
-    TextureRegion[] animationFrames;
-    Animation animation;
+    private Texture explosionImg;
+    private TextureRegion[] animationFrames;
+    public Animation animation;
     public float elapsedTime;
-    SpriteBatch batch;
-    private boolean hasStarted = false;
+    private SpriteBatch batch;
+    public boolean hasStarted = false;
+    public float x, y;
 
-    public Explosion(){
+    public Explosion(float x, float y, boolean started){
+        this.x = x-20;
+        this.y = y-20;
+        hasStarted = true;
         batch = new SpriteBatch();
         explosionImg = new Texture("explosion1.png");
         TextureRegion[][] tmpFrames = new TextureRegion(explosionImg).split(
