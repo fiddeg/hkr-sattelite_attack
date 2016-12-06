@@ -1,4 +1,5 @@
 package com.mygdx.game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -6,33 +7,40 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 /**
  * Created by Nikolaj on 2016-12-05.
  */
-public class Explosion extends Figure{
-    Texture explotionImg;
+public class Explosion{
+    private static final int FRAME_COLS = 8;
+    private static final int FRAME_ROWS = 6;
+
+    Texture explosionImg;
     TextureRegion[] animationFrames;
     Animation animation;
-    float elapsedTime;
+    public float elapsedTime;
     SpriteBatch batch;
-    // elapsedTime = Gdx.graphics.getDeltaTime();
-    public Explosion(String textureFileName, float x, float y, int sizeX, int sizeY){
-        //First call the parent class constructor (MovingFigure)
-        super(textureFileName, x, y, sizeX, sizeY);
+    private boolean hasStarted = false;
+
+    public Explosion(){
         batch = new SpriteBatch();
-        explotionImg = new Texture("explosion.png");
-        TextureRegion[][] tmpFrames = TextureRegion.split(explotionImg, sizeX, sizeY);
-        animationFrames = new TextureRegion[4];
+        explosionImg = new Texture("explosion1.png");
+        TextureRegion[][] tmpFrames = new TextureRegion(explosionImg).split(
+                explosionImg.getWidth()/FRAME_COLS,
+                explosionImg.getHeight()/FRAME_ROWS);
+        animationFrames = new TextureRegion[FRAME_COLS*FRAME_ROWS];
         int index = 0;
-        for(int i = 0; i < 2; i++){
-            for(int j = 0; j < 2; j++){
-                animationFrames[index] = tmpFrames[j][i];
-                index++;
+        for(int i = 0; i < FRAME_ROWS; i++){
+            for(int j = 0; j < FRAME_COLS; j++){
+                animationFrames[index++] = tmpFrames[i][j];
             }
         }
-        animation = new Animation(1f/100f, animationFrames);
+        animation = new Animation(0.01f, animationFrames);
+        animation.setPlayMode(Animation.PlayMode.NORMAL);
     }
-    public void addExplosion(float x, float y){
+
+    public void addExplosion(float deltaTime, float x, float y){
+        elapsedTime += deltaTime;
         batch.begin();
-        batch.draw(animation.getKeyFrame(elapsedTime), x , y);
+        batch.draw(animation.getKeyFrame(elapsedTime), x-20 , y-20);
         batch.end();
+
     }
 }
 
