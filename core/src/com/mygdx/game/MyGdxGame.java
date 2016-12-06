@@ -19,6 +19,8 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	private enum GameState{
 		TITLE_SCREEN,
+		HELP_SCREEN,
+		HIGH_SCORE_SCORE,
 		LEVEL_1,
 		LEVEL_2,
 		LEVEL_3,
@@ -29,6 +31,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	private GameState gameState = GameState.TITLE_SCREEN;
 	private SpriteBatch batch;
+	private Texture gameOverImage;
 	private Texture img;
 	private Spaceship spaceship;
 	private ArrayList<Bullet> bulletList = new ArrayList<Bullet>();
@@ -56,6 +59,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	private int menuPos = 0;
 	private String[] asteroidPicture= new String[]{"brownast.png","brownspotast.png"};
 	private String[] magneticAsteroidPicture= new String[]{"coboltast.png","bluestripeast.png"};
+	private ArrayList<Explosion> explosionList = new ArrayList<Explosion>();
 
 
 	private int countAsteroid = 0;
@@ -68,14 +72,19 @@ public class MyGdxGame extends ApplicationAdapter {
 	private float explosionX = 0;
 	private float explosionY = 0;
 	private int randomSatellite;
+	private boolean gameOver = false;
 
 
 
 	@Override
 	public void create () {
+		createNew();
+	}
 
+	public void createNew(){
 		batch = new SpriteBatch();
 		img = new Texture("spaceBack.jpg");
+		gameOverImage = new Texture("GameOver.png");
 		pew = Gdx.audio.newSound(Gdx.files.internal("sounds/pew.wav"));
 		explosion = Gdx.audio.newSound(Gdx.files.internal("sounds/explode.wav"));
 		satellitePew = Gdx.audio.newSound(Gdx.files.internal("sounds/satellitepew.wav"));
@@ -85,8 +94,8 @@ public class MyGdxGame extends ApplicationAdapter {
 		font = new BitmapFont();
 		createObjects();
 		spawnAsteroid();
-        spawnMagneticAsteroid();
-        explosionImage = new Explosion();
+		spawnMagneticAsteroid();
+		explosionImage = new Explosion();
 	}
 
 	/**
@@ -226,18 +235,14 @@ public class MyGdxGame extends ApplicationAdapter {
 		else if (gameState == GameState.LEVEL_COMPLETE_2) {
 			level2Complete();
 		}
+		else if (gameState == GameState.GAME_OVER) {
+			renderGameStateGameOver();
+		}
+		else if (gameState == GameState.HELP_SCREEN){
+			renderHelpScreen();
+		}
 	}
 
-	@Override
-	public void dispose(){
-		batch.dispose();
-		img.dispose();
-		pew.dispose();
-		explosion.dispose();
-		satellitePew.dispose();
-		backMusic.dispose();
-		titleMusic.dispose();
-	}
 
 	public void magneticAsteroid(){
 		for (MagneticAsteroid mAsteroid : magneticAsteroidList){
@@ -465,12 +470,8 @@ public class MyGdxGame extends ApplicationAdapter {
 		shield.updatePositionFromSpaceship(spaceship.getX(), spaceship.getY(), Gdx.graphics.getDeltaTime());
 		cannon.updatePositionFromSpaceship(spaceship.getX(), spaceship.getY());
 
-
-
 		spawnNewAsteroid();
 		spawnNewMagneticAsteroid();
-
-
 
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -494,6 +495,12 @@ public class MyGdxGame extends ApplicationAdapter {
 				explosionImage.elapsedTime = 0;
 			}
 		}
+
+		for(Explosion explosionImage : explosionList){
+			batch.draw(explosionImage.animation.getKeyFrame(explosionImage.elapsedTime), explosionX-20, explosionY-20);
+
+		}
+
 		for (Asteroid asteroid : asteroidList){
 			asteroid.draw(batch);
 		}
@@ -505,6 +512,10 @@ public class MyGdxGame extends ApplicationAdapter {
 		}
         for (Asteroid asteroid : asteroidList) {
             asteroid.updatePositionFromSpeed();
+			if (asteroid.collidesWith(spaceship.getCollisionRectangle())){
+				gameOver = true;
+				asteroid.hit();
+			}
             for (Bullet bullet : bulletList){
                 if (asteroid.collidesWith(bullet.getCollisionRectangle())) {
                     if (bullet instanceof SpaceshipBullet){
@@ -574,6 +585,10 @@ public class MyGdxGame extends ApplicationAdapter {
 		}
 
 		for (MagneticAsteroid magneticAsteroid : magneticAsteroidList) {
+			if (magneticAsteroid.collidesWith(spaceship.getCollisionRectangle())){
+				gameOver = true;
+				asteroid.hit();
+			}
 			if (shield.collidesWith(magneticAsteroid.getCollisionRectangle())) {
 				shield.isHit();
 				magneticAsteroid.hit();
@@ -610,6 +625,16 @@ public class MyGdxGame extends ApplicationAdapter {
 		if (tempDispose.size() != 0){
 			bulletList.remove(tempDispose.get(0));
 			tempDispose.remove(0);
+		}
+
+		if (gameOver){
+			gameState = gameState.GAME_OVER;
+			if (score > highScore){
+				highScore = score;
+			}
+			score = 0;
+			enemysLeft = 15;
+			gameOver = false;
 		}
 
 		if (enemysLeft <= 0){
@@ -655,6 +680,13 @@ public class MyGdxGame extends ApplicationAdapter {
 				explosionImage.elapsedTime = 0;
 			}
 		}
+
+		for(Explosion explosionImage : explosionList){
+			batch.draw(explosionImage.animation.getKeyFrame(explosionImage.elapsedTime), explosionX-20, explosionY-20);
+
+		}
+
+
 		for (Asteroid asteroid : asteroidList){
 			asteroid.draw(batch);
 		}
@@ -664,6 +696,11 @@ public class MyGdxGame extends ApplicationAdapter {
 
         for (Asteroid asteroid : asteroidList) {
             asteroid.updatePositionFromSpeed();
+			if (asteroid.collidesWith(spaceship.getCollisionRectangle())){
+				gameOver = true;
+				asteroid.hit();
+			}
+
             for (Bullet bullet : bulletList){
                 if (asteroid.collidesWith(bullet.getCollisionRectangle())) {
                     if (bullet instanceof SpaceshipBullet){
@@ -741,6 +778,16 @@ public class MyGdxGame extends ApplicationAdapter {
 			tempDispose.remove(0);
 		}
 
+		if (gameOver){
+			gameState = gameState.GAME_OVER;
+			if (score > highScore){
+				highScore = score;
+			}
+			score = 0;
+			enemysLeft = 15;
+			gameOver = false;
+		}
+
 		if (enemysLeft <= 0){
 			gameState = gameState.LEVEL_COMPLETE_1;
 			enemysLeft = 15;
@@ -749,10 +796,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	public void level1Complete(){
 
-		spaceship.setX(Gdx.graphics.getWidth()/2);
-		spaceship.setY(Gdx.graphics.getHeight()/2);
-
-		img = new Texture("levelonecompleted.png");
+		img = new Texture("level1completed.png");
 
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -765,14 +809,11 @@ public class MyGdxGame extends ApplicationAdapter {
 			img = new Texture("spaceBack.jpg");
 		}
 		batch.end();
+		createNew();
 	}
 
 	public void level2Complete(){
-
-		spaceship.setX(Gdx.graphics.getWidth()/2);
-		spaceship.setY(Gdx.graphics.getHeight()/2);
-
-		img = new Texture("levelonecompleted.png");
+		img = new Texture("level2completed.png");
 
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -785,6 +826,7 @@ public class MyGdxGame extends ApplicationAdapter {
 			img = new Texture("spaceBack.jpg");
 		}
 		batch.end();
+		createNew();
 	}
 
 	private void titleScreen() {
@@ -808,8 +850,15 @@ public class MyGdxGame extends ApplicationAdapter {
 				gameState = GameState.LEVEL_1;
 				img = new Texture("spaceBack.jpg");
 			}
+			else if (menuPos == 2) {
+				gameState = GameState.HELP_SCREEN;
+			}
+			else if (menuPos == 3) {
+				System.exit(0);
+			}
 		}
 		batch.end();
+		createNew();
 	}
 
 	public void checkInputMenu() {
@@ -880,6 +929,12 @@ public class MyGdxGame extends ApplicationAdapter {
 				explosionImage.elapsedTime = 0;
 			}
 		}
+
+		for(Explosion explosionImage : explosionList){
+			batch.draw(explosionImage.animation.getKeyFrame(explosionImage.elapsedTime), explosionX-20, explosionY-20);
+
+		}
+
 		for (Asteroid asteroid : asteroidList){
 			asteroid.draw(batch);
 		}
@@ -894,6 +949,11 @@ public class MyGdxGame extends ApplicationAdapter {
 		}
 		for (Asteroid asteroid : asteroidList) {
 			asteroid.updatePositionFromSpeed();
+			if (asteroid.collidesWith(spaceship.getCollisionRectangle())){
+				gameOver = true;
+				asteroid.hit();
+			}
+
 			for (Bullet bullet : bulletList){
 				if (asteroid.collidesWith(bullet.getCollisionRectangle())) {
 					if (bullet instanceof SpaceshipBullet){
@@ -912,6 +972,11 @@ public class MyGdxGame extends ApplicationAdapter {
 
 				}
 				if (bullet instanceof SatelliteBullet){
+					if (spaceship.collidesWith(bullet.getCollisionRectangle())){
+						gameState = GameState.GAME_OVER;
+						batch.end();
+						return;
+					}
 					if (shield.collidesWith(bullet.getCollisionRectangle())){
 						shield.isHit();
 						bullet.hit();
@@ -928,6 +993,10 @@ public class MyGdxGame extends ApplicationAdapter {
 		}
 		for (MagneticAsteroid magneticAsteroid : magneticAsteroidList) {
 			magneticAsteroid.updatePositionFromSpeed();
+			if (magneticAsteroid.collidesWith(spaceship.getCollisionRectangle())){
+				gameOver = true;
+				asteroid.hit();
+			}
 
 			for (Bullet bullet : bulletList) {
 				if (magneticAsteroid.collidesWith(bullet.getCollisionRectangle())) {
@@ -986,6 +1055,18 @@ public class MyGdxGame extends ApplicationAdapter {
 					}
 				}
 			}
+
+			if (satellite.collidesWith(shield.getCollisionRectangle())){
+				satellite.hit();
+				shield.isHit();
+				//explosionImage.addExplosion(Gdx.graphics.getDeltaTime(), satellite.getX(), satellite.getY());
+				explosionStarted = true;
+				explosionX = satellite.getX();
+				explosionY = satellite.getY();
+				score++;
+				enemysLeft--;
+				break;
+			}
 		}
 
 		for (MagneticAsteroid magneticAsteroid : magneticAsteroidList) {
@@ -1037,6 +1118,57 @@ public class MyGdxGame extends ApplicationAdapter {
 				break;
 			}
 		}
+
+		if (gameOver){
+			gameState = gameState.GAME_OVER;
+			if (score > highScore){
+				highScore = score;
+			}
+			score = 0;
+			enemysLeft = 15;
+			gameOver = false;
+		}
+	}
+
+	public void renderGameStateGameOver(){
+		//Check for exit game-key.
+		Gdx.gl.glClearColor(1, 0, 0, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		//Now draw the background and the movingFigures!
+		batch.begin();
+		batch.draw(gameOverImage, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+			gameState = GameState.TITLE_SCREEN;
+		}
+		batch.end();
+	}
+
+	public void renderHelpScreen(){
+		img = new Texture("HelpScreen.png");
+		Gdx.gl.glClearColor(1, 0, 0, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		//Now draw the background and the movingFigures!
+		batch.begin();
+		batch.draw(img, 0, 0);
+		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+			gameState = GameState.TITLE_SCREEN;
+		}
+		if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+			gameState = GameState.LEVEL_1;
+		}
+		batch.end();
+		createNew();
+	}
+
+	@Override
+	public void dispose(){
+		batch.dispose();
+		img.dispose();
+		pew.dispose();
+		explosion.dispose();
+		satellitePew.dispose();
+		backMusic.dispose();
+		titleMusic.dispose();
 	}
 }
 
