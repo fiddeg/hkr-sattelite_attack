@@ -21,7 +21,6 @@ public class Satellite extends Figure{
         getSprite().setOriginCenter();
         RandomDirection();
         time = 10;
-        System.out.println(timeToShoot);
 
         float opposite = getSpeedX();
         float adjacent = getSpeedY();

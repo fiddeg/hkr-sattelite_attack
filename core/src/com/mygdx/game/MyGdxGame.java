@@ -340,7 +340,6 @@ public class MyGdxGame extends ApplicationAdapter {
 
 			int size = (int)(Math.random()* (70 - 35))+35;
 			int texture = (int)(Math.random()* 2);
-			System.out.println(texture);
 
 			magneticAsteroid = new MagneticAsteroid(magneticAsteroidPicture[texture], rngX, rngY, size, size);
 
