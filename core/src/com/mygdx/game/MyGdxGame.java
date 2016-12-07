@@ -33,6 +33,10 @@ public class MyGdxGame extends ApplicationAdapter {
 	private SpriteBatch batch;
 	private Texture gameOverImage;
 	private Texture img;
+	private Texture titleImg;
+	private Texture levelOneImg;
+	private Texture levelTwoImg;
+	private Texture helpScreenImg;
 	private Spaceship spaceship;
 	private ArrayList<Bullet> bulletList = new ArrayList<Bullet>();
 	private ArrayList<Bullet> tempDispose = new ArrayList<Bullet>();
@@ -71,18 +75,25 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	@Override
 	public void create () {
+		batch = new SpriteBatch();
 		backMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/backmusic.mp3"));
 		titleMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/titlemusic.mp3"));
 		createNew();
 	}
 
 	public void createNew(){
-		batch = new SpriteBatch();
+		//batch = new SpriteBatch();
 		img = new Texture("spaceBack.jpg");
 		gameOverImage = new Texture("GameOver.png");
 		pew = Gdx.audio.newSound(Gdx.files.internal("sounds/pew.wav"));
 		explosion = Gdx.audio.newSound(Gdx.files.internal("sounds/explode.wav"));
 		satellitePew = Gdx.audio.newSound(Gdx.files.internal("sounds/satellitepew.wav"));
+		titleImg = new Texture("menubg.png");
+		levelOneImg = new Texture("level1completed.png");
+		levelTwoImg = new Texture("level2completed.png");
+		helpScreenImg = new Texture("HelpScreen.png");
+		menuTexture = new Texture(Gdx.files.internal("menuarrow.png"));
+		menuSprite = new Sprite(menuTexture);
 		font = new BitmapFont();
 		createObjects();
 		spawnAsteroid();
@@ -762,56 +773,52 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	public void level1Complete(){
 		titleMusic.play();
-		img = new Texture("level1completed.png");
 
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		batch.begin();
-		batch.draw(img, 0, 0);
+		batch.draw(levelOneImg, 0, 0);
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
 			titleMusic.stop();
 			backMusic.play();
 			gameState = GameState.LEVEL_2;
 			img = new Texture("spaceBack.jpg");
+			createNew();
 		}
 		batch.end();
-		createNew();
 	}
 
 	public void level2Complete(){
 		titleMusic.play();
-		img = new Texture("level2completed.png");
 
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		batch.begin();
-		batch.draw(img, 0, 0);
+		batch.draw(levelTwoImg, 0, 0);
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
 			titleMusic.stop();
 			backMusic.play();
 			gameState = GameState.LEVEL_3;
-			img = new Texture("spaceBack.jpg");
+			createNew();
 		}
 		batch.end();
-		createNew();
 	}
 
 	private void titleScreen() {
 		titleMusic.play();
 
-		img = new Texture("menubg.png");
-		menuTexture = new Texture(Gdx.files.internal("menuarrow.png"));
-		menuSprite = new Sprite(menuTexture);
+		Gdx.gl.glClearColor(1, 0, 0, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		checkInputMenu();
 		updateArrowMenuPos();
 
 		batch.begin();
-		batch.draw(img, 0, 0);
+		batch.draw(titleImg, 0, 0);
 		menuSprite.draw(batch);
 
 
@@ -821,7 +828,6 @@ public class MyGdxGame extends ApplicationAdapter {
 				titleMusic.stop();
 				backMusic.play();
 				gameState = GameState.LEVEL_1;
-				img = new Texture("spaceBack.jpg");
 			}
 			else if (menuPos == 2) {
 				gameState = GameState.HELP_SCREEN;
@@ -829,9 +835,9 @@ public class MyGdxGame extends ApplicationAdapter {
 			else if (menuPos == 3) {
 				System.exit(0);
 			}
+			createNew();
 		}
 		batch.end();
-		createNew();
 	}
 
 	public void checkInputMenu() {
@@ -1087,6 +1093,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	}
 
 	public void renderGameStateGameOver(){
+
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -1101,21 +1108,21 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	public void renderHelpScreen(){
 		titleMusic.play();
-		img = new Texture("HelpScreen.png");
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		batch.begin();
-		batch.draw(img, 0, 0);
+		batch.draw(helpScreenImg, 0, 0);
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
 			gameState = GameState.TITLE_SCREEN;
+			createNew();
 		}
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
 			titleMusic.stop();
 			gameState = GameState.LEVEL_1;
 			backMusic.play();
+			createNew();
 		}
 		batch.end();
-		createNew();
 	}
 
 	@Override
