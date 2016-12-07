@@ -10,16 +10,12 @@ import com.badlogic.gdx.math.Rectangle;
  * Created by Fidde on 2016-11-08.
  */
 public class Bullet {
-    private Rectangle bullet;
     private int speedX, speedY;
     private Sprite sprite;
-    private float a, time, angle, deltaTimer;
-    private Texture picture;
+    private float time, angle;
 
-    public Bullet(float positionX, float positionY, float angle, float direction){
-        //bullet = new Rectangle(positionX, positionY, 4, 14);
-        //picture = new Texture("bullet.png");
-        sprite = new Sprite(new Texture("bullet.png"));
+    public Bullet(String texture,float positionX, float positionY, float angle, float direction){
+        sprite = new Sprite(new Texture(texture));
         sprite.setSize(4, 14);
         sprite.setX(positionX);
         sprite.setY(positionY);
@@ -78,8 +74,6 @@ public class Bullet {
     }
 
     public void update(float delta){
-        //bullet.x += speedX * (float)Math.sin(a) * delta;
-        //bullet.y += speedY * (float)Math.cos(a) * delta;
         sprite.setX(getX() + speedX * (float)Math.sin(angle) * delta);
         sprite.setY(getY() + speedY * (float)Math.cos(angle) * delta);
         time -= delta;
@@ -87,8 +81,11 @@ public class Bullet {
 
 
     public void draw(SpriteBatch batch){
-        //batch.draw(picture, bullet.x, bullet.y, 4, 14);
         sprite.draw(batch);
+    }
+
+    public void hit(){
+        time = 0;
     }
 
     public boolean isTimeout(){
@@ -96,6 +93,11 @@ public class Bullet {
             return true;
         }
         return false;
+
+    }
+
+    public Rectangle getCollisionRectangle(){
+        return sprite.getBoundingRectangle();
 
     }
 }
