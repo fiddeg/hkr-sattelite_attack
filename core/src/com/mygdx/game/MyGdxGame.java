@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.assets.loaders.AssetLoader;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
@@ -10,6 +11,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -27,32 +29,37 @@ public class MyGdxGame extends ApplicationAdapter {
 		LEVEL_COMPLETE_1,
 		LEVEL_COMPLETE_2,
 		LEVEL_COMPLETE_3,
-        LEVEL_COMPLETE_4,
+		LEVEL_COMPLETE_4,
 		GAME_OVER
 	}
 
-	private GameState gameState = GameState.LEVEL_2;
+	private GameState gameState = GameState.LEVEL_3;
 	private SpriteBatch batch;
+	private HighScoreIO highScoreIO = new HighScoreIO();
+	private Save save = new Save();
 	private Texture gameOverImage;
 	private Texture img;
 	private Texture titleImg;
 	private Texture levelOneImg;
 	private Texture levelTwoImg;
-    private Texture levelThreeImg;
+	private Texture levelThreeImg;
 	private Texture helpScreenImg;
+	private Texture highScoreImg;
 	private Spaceship spaceship;
 	private ArrayList<Bullet> bulletList = new ArrayList<Bullet>();
 	private ArrayList<Bullet> tempDispose = new ArrayList<Bullet>();
 	private Shield shield;
 	private Cannon cannon;
 	private Asteroid asteroid;
-    private GiantAsteroid giantAsteroid;
-    private JuniorAsteroid juniorAsteroid;
+	private GiantAsteroid giantAsteroid;
+	private JuniorAsteroid juniorAsteroid;
+	private static PowerUp powerUp;
+	private InputKeys inputKeys = new InputKeys();
 	private MagneticAsteroid magneticAsteroid;
     private ArrayList<Asteroid> asteroidList = new ArrayList<Asteroid>();
     private ArrayList<MagneticAsteroid> magneticAsteroidList = new ArrayList<MagneticAsteroid>();
-    private ArrayList<GiantAsteroid> giantAsteroidList = new ArrayList<GiantAsteroid>();
-    private ArrayList<JuniorAsteroid> juniorAsteriodList = new ArrayList<JuniorAsteroid>();
+	private ArrayList<GiantAsteroid> giantAsteroidList = new ArrayList<GiantAsteroid>();
+	private ArrayList<JuniorAsteroid> juniorAsteriodList = new ArrayList<JuniorAsteroid>();
 	private ArrayList<Satellite> satelliteList = new ArrayList<Satellite>();
 	private Sound pew;
 	private Sound explosion;
@@ -60,6 +67,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	private Music backMusic;
     private int timer;
 	private BitmapFont font;
+	private BitmapFont fontHighScore;
 	private Music titleMusic;
 	private Sprite menuSprite;
 	private Texture menuTexture;
@@ -67,16 +75,20 @@ public class MyGdxGame extends ApplicationAdapter {
 	private String[] asteroidPicture= new String[]{"brownast.png","brownspotast.png"};
 	private String[] magneticAsteroidPicture= new String[]{"coboltast.png","bluestripeast.png"};
 	private ArrayList<Explosion> explosionList = new ArrayList<Explosion>();
+	private String highScoreText = "";
+	private int[] highScoresList;
+	private ArrayList<PowerUp> powerUpList = new ArrayList<PowerUp>();
 
-
+	private int specialShots = 0;
 	private int countAsteroid = 0;
     private int countMagneticAsteroid = 0;
-    int countGiantAsteroid= 0;
+	private int countGiantAsteroid= 0;
 	private int score = 0;
 	private int enemysLeft = 15;
 	private int highScore = 0;
 	private int randomSatellite;
 	private boolean gameOver = false;
+	private boolean highScoreListAdded = false;
 
 
 
@@ -100,13 +112,24 @@ public class MyGdxGame extends ApplicationAdapter {
 		levelTwoImg = new Texture("level2completed.png");
 		levelThreeImg = new Texture("Level3completed.png");
 		helpScreenImg = new Texture("HelpScreen.png");
+		highScoreImg = new Texture("highscore.png");
 		menuTexture = new Texture(Gdx.files.internal("menuarrow.png"));
 		menuSprite = new Sprite(menuTexture);
 		font = new BitmapFont();
+
+
+		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/space age.ttf"));
+		FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+		parameter.size = 41;
+		fontHighScore = generator.generateFont(parameter);
+		generator.dispose();
+
+		Save.load();
+		highScoresList = Save.io.getHighScores();
 		createObjects();
 		spawnAsteroid();
 		spawnMagneticAsteroid();
-        spawnGiantAsteroid();
+		spawnGiantAsteroid();
 	}
 
 	/**
@@ -122,11 +145,6 @@ public class MyGdxGame extends ApplicationAdapter {
 	}
 
 	public void checkInput() {
-
-        /**
-         * If-statement för att röra skeppet i olika riktningar.
-         * / Fredrik
-         */
 		if (Gdx.input.isKeyPressed(Input.Keys.W)){
 			spaceship.goUp();
 			spaceship.setRotation(0);
@@ -184,25 +202,32 @@ public class MyGdxGame extends ApplicationAdapter {
             cannon.rotateRight();
         }
 
-        /**
-         * För att skjuta skott med Spacebar.
-         * / Fredrik
-         */
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            createBulletCannon();
+			if (specialShots > 0){
+				createSpecialBullet();
+				specialShots--;
+			}
+			else {
+				createBulletCannon();
+			}
 			pew.play();
         }
+	}
 
-        /**
-		if (Gdx.input.isKeyJustPressed(Input.Keys.CONTROL_RIGHT)){
-			if (satelliteList.size() == 0){
-				randomSatellite();
-			}
-		}
-		 **/
+	public Spaceship getSpaceship(){
+		return spaceship;
+	}
 
+	public Cannon getCannon(){
+		return cannon;
+	}
 
+	public Sound getPew(){
+		return pew;
+	}
 
+	public MyGdxGame getInstance(){
+		return MyGdxGame.this;
 	}
 
 	public void createBulletCannon(){
@@ -223,6 +248,17 @@ public class MyGdxGame extends ApplicationAdapter {
 		} else if (cannon.getRotation() == 180){ //Done
 			bulletList.add(new SpaceshipBullet("bullet.png", cannon.getX()+4, cannon.getY()-25, cannon.getRotation(), (cannon.getRotation() * (float)Math.PI / -180)));
 		}
+	}
+
+	public void createSpecialBullet(){
+		bulletList.add(new SpaceshipBullet("bullet.png",cannon.getX()+2 , cannon.getY()+23, 0, (0 * (float)Math.PI / -180)));
+		bulletList.add(new SpaceshipBullet("bullet.png", cannon.getX()-19, cannon.getY()-1, 90, (90 * (float)Math.PI / -180)));
+		bulletList.add(new SpaceshipBullet("bullet.png", cannon.getX()+25, cannon.getY()-1, -90, (-90 * (float)Math.PI / -180)));
+		bulletList.add(new SpaceshipBullet("bullet.png", cannon.getX()-13, cannon.getY()+15, 45, (45 * (float)Math.PI / -180)));
+		bulletList.add(new SpaceshipBullet("bullet.png", cannon.getX()+18, cannon.getY()+14, -45, (-45 * (float)Math.PI / -180)));
+		bulletList.add(new SpaceshipBullet("bullet.png", cannon.getX()-13, cannon.getY()-19, 135, (135 * (float)Math.PI / -180)));
+		bulletList.add(new SpaceshipBullet("bullet.png", cannon.getX()+20, cannon.getY()-18, -135, (-135 * (float)Math.PI / -180)));
+		bulletList.add(new SpaceshipBullet("bullet.png", cannon.getX()+4, cannon.getY()-25, 180, (180 * (float)Math.PI / -180)));
 	}
 
 
@@ -250,17 +286,20 @@ public class MyGdxGame extends ApplicationAdapter {
 		else if (gameState == GameState.LEVEL_COMPLETE_2) {
 			level2Complete();
 		}
-        else if (gameState == GameState.LEVEL_COMPLETE_3) {
-            level3Complete();
-        }
-        else if (gameState == GameState.LEVEL_COMPLETE_4) {
-            titleScreen();
-        }
+		else if (gameState == GameState.LEVEL_COMPLETE_3) {
+			level3Complete();
+		}
+		else if (gameState == GameState.LEVEL_COMPLETE_4) {
+			titleScreen();
+		}
 		else if (gameState == GameState.GAME_OVER) {
 			renderGameStateGameOver();
 		}
 		else if (gameState == GameState.HELP_SCREEN){
 			renderHelpScreen();
+		}
+		else if (gameState == GameState.HIGH_SCORE_SCORE){
+			renderHighScore();
 		}
 	}
 
@@ -290,60 +329,55 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	public int randomX(){
 
-        Random spawn = new Random();
+		Random spawn = new Random();
 		int rngX = (spawn.nextInt(Gdx.graphics.getWidth()+200)-100);
 
 		while ( rngX > 0 && rngX < 1200) {
 			rngX = (spawn.nextInt(Gdx.graphics.getWidth()+200)-100);
 		}
 		return rngX;
-    }
+	}
 
-    public int randomY(){
+	public int randomY(){
 
-        Random spawn = new Random();
+		Random spawn = new Random();
 		int rngY = (spawn.nextInt(Gdx.graphics.getHeight()+100)-100);
-        return rngY;
-    }
+		return rngY;
+	}
 
-    public void spawnGiantAsteroid(){
+	public void spawnGiantAsteroid(){
 
-        while (countGiantAsteroid <= 3){
-    		int rngX = randomX();
-    		int rngY = randomY();
+		while (countGiantAsteroid <= 3){
+			int rngX = randomX();
+			int rngY = randomY();
 
-   		 	//int texture = (int)(Math.random()* 2);
+			giantAsteroid = new GiantAsteroid("asteroid-icon.png", rngX, rngY, 210, 210);
 
-   		 	giantAsteroid = new GiantAsteroid("asteroid-icon.png", rngX, rngY, 210, 210);
+			giantAsteroidList.add(giantAsteroid);
+			countGiantAsteroid++;
+		}
+	}
 
-    		giantAsteroidList.add(giantAsteroid);
-   		 	countGiantAsteroid++;
+	public void spawnMagneticAsteroid() {
 
-}
-
-
-
-    }
-    public void spawnMagneticAsteroid() {
-
-        while (countMagneticAsteroid < 4) {
-            int rngX = randomX();
-            int rngY = randomY();
+		while (countMagneticAsteroid < 4) {
+			int rngX = randomX();
+			int rngY = randomY();
 
 			int size = (int)(Math.random()* (70 - 35))+35;
 			int texture = (int)(Math.random()* 2);
 
-            magneticAsteroid = new MagneticAsteroid(magneticAsteroidPicture[texture], rngX, rngY, size, size);
+			magneticAsteroid = new MagneticAsteroid(magneticAsteroidPicture[texture], rngX, rngY, size, size);
 			magneticAsteroid.setSpeedX(randomSpeed());
 			magneticAsteroid.setSpeedY(randomSpeed());
 			magneticAsteroidList.add(magneticAsteroid);
-            countMagneticAsteroid++;
+			countMagneticAsteroid++;
+		}
+	}
 
-        }
-    }
 	public void spawnAsteroid() {
 
-        while (countAsteroid <= 10){
+		while (countAsteroid <= 10){
 			int rngX = randomX();
 			int rngY = randomY();
 
@@ -353,24 +387,23 @@ public class MyGdxGame extends ApplicationAdapter {
 			asteroid = new Asteroid(asteroidPicture[texture], rngX, rngY, size, size);
 			asteroid.setSpeedX(randomSpeed());
 			asteroid.setSpeedY(randomSpeed());
-            asteroidList.add(asteroid);
-            countAsteroid++;
+			asteroidList.add(asteroid);
+			countAsteroid++;
+		}
+	}
+	public void spawnJuniorAsteroids(float x, float y) {
+
+		for (int i = 0; i < 3; i++){
+
+			int size = (int)(Math.random()* (70 - 35))+35;
+			int texture = (int)(Math.random()* 2);
+
+			juniorAsteroid = new JuniorAsteroid(asteroidPicture[texture], x, y, size, size);
+			juniorAsteriodList.add(juniorAsteroid);
+
 		}
 
 	}
-    public void spawnJuniorAsteroids(float x, float y) {
-
-        for (int i = 0; i < 3; i++){
-
-            int size = (int)(Math.random()* (70 - 35))+35;
-            int texture = (int)(Math.random()* 2);
-
-            juniorAsteroid = new JuniorAsteroid(asteroidPicture[texture], x, y, size, size);
-            juniorAsteriodList.add(juniorAsteroid);
-
-        }
-
-    }
 	public void spawnNewAsteroid(){
 
 		if (countAsteroid <= 10){
@@ -389,7 +422,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	}
 
 
-    public void spawnNewMagneticAsteroid() {
+	public void spawnNewMagneticAsteroid() {
 		if (countMagneticAsteroid < 4){
 			int rngX = randomX();
 			int rngY = randomY();
@@ -403,7 +436,7 @@ public class MyGdxGame extends ApplicationAdapter {
 			magneticAsteroidList.add(magneticAsteroid);
 			countMagneticAsteroid++;
 		}
-    }
+	}
 
 	public float randomSpeed() {
 		Random random = new Random();
@@ -414,6 +447,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		}
 		return randomSpeed;
 	}
+
 
 	public void randomSatellite(){
 		Random spawn = new Random();
@@ -518,7 +552,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	public void level2(){
 		checkInput();
-		spaceship.updatePositionFromSpeed();
+		spaceship.updatePositionFromSpeed(Gdx.graphics.getDeltaTime());
 		shield.updatePositionFromSpaceship(spaceship.getX(), spaceship.getY(), Gdx.graphics.getDeltaTime());
 		cannon.updatePositionFromSpaceship(spaceship.getX(), spaceship.getY());
 
@@ -560,6 +594,24 @@ public class MyGdxGame extends ApplicationAdapter {
 		for (Bullet bullet : bulletList) {
 			bullet.draw(batch);
 		}
+
+		for (PowerUp powerUp : powerUpList){
+			if (powerUp.collidesWith(spaceship.getCollisionRectangle()) || powerUp.collidesWith(shield.getCollisionRectangle())){
+				if (powerUp.getTypePowerUp() == 1){
+					spaceship.powerUpSpeed();
+				}
+				else if (powerUp.getTypePowerUp() == 2){
+					specialShots = 5;
+				}
+				powerUp.hit();
+			}
+			if (powerUp.isHit()){
+				powerUpList.remove(powerUp);
+				break;
+			}
+
+		}
+
         for (Asteroid asteroid : asteroidList) {
             asteroid.updatePositionFromSpeed();
 			if (asteroid.collidesWith(spaceship.getCollisionRectangle())){
@@ -572,6 +624,9 @@ public class MyGdxGame extends ApplicationAdapter {
                         asteroid.hit();
                         bullet.hit();
 						explosionList.add(new Explosion(asteroid.getX(), asteroid.getY(), true));
+						if (powerUp.shouldSpawn()){
+							powerUpList.add(new PowerUp(asteroid.getX()+(asteroid.getWidth()/2), asteroid.getY() + (asteroid.getHeight()/2)));
+						}
                         countAsteroid--;
                         score++;
 						enemysLeft--;
@@ -581,6 +636,21 @@ public class MyGdxGame extends ApplicationAdapter {
 
                 }
             }
+
+			if (shield.collidesWith(asteroid.getCollisionRectangle())) {
+				shield.isHit();
+				asteroid.hit();
+				explosionList.add(new Explosion(asteroid.getX(), asteroid.getY(), true));
+				if (powerUp.shouldSpawn()){
+					powerUpList.add(new PowerUp(asteroid.getX()+(asteroid.getWidth()/2), asteroid.getY() + (asteroid.getHeight()/2)));
+				}
+				countAsteroid--;
+				explosion.play();
+				score++;
+				enemysLeft--;
+				break;
+			}
+
             if (asteroid.isHit()){
                 asteroidList.remove(asteroid);
                 break;
@@ -596,6 +666,9 @@ public class MyGdxGame extends ApplicationAdapter {
                         magneticAsteroid.hit();
                         bullet.hit();
 						explosionList.add(new Explosion(magneticAsteroid.getX(), magneticAsteroid.getY(), true));
+						if (powerUp.shouldSpawn()){
+							powerUpList.add(new PowerUp(magneticAsteroid.getX()+(magneticAsteroid.getWidth()/2), magneticAsteroid.getY() + (magneticAsteroid.getHeight()/2)));
+						}
                         score++;
 						enemysLeft--;
                         countMagneticAsteroid--;
@@ -605,43 +678,30 @@ public class MyGdxGame extends ApplicationAdapter {
                 }
             }
 
+			if (magneticAsteroid.collidesWith(spaceship.getCollisionRectangle())){
+				gameOver = true;
+				asteroid.hit();
+			}
+
+			if (shield.collidesWith(magneticAsteroid.getCollisionRectangle())) {
+				shield.isHit();
+				magneticAsteroid.hit();
+				explosionList.add(new Explosion(magneticAsteroid.getX(), magneticAsteroid.getY(), true));
+				if (powerUp.shouldSpawn()){
+					powerUpList.add(new PowerUp(magneticAsteroid.getX()+(magneticAsteroid.getWidth()/2), magneticAsteroid.getY() + (magneticAsteroid.getHeight()/2)));
+				}
+				countMagneticAsteroid--;
+				explosion.play();
+				score++;
+				enemysLeft--;
+				break;
+			}
+
             if (magneticAsteroid.isHit()) {
                 magneticAsteroidList.remove(magneticAsteroid);
                 break;
             }
         }
-		//asteroid.draw(batch);
-		for (Asteroid asteroid : asteroidList) {
-			if (shield.collidesWith(asteroid.getCollisionRectangle())) {
-				shield.isHit();
-				asteroid.hit();
-				explosionList.add(new Explosion(asteroid.getX(), asteroid.getY(), true));
-				countAsteroid--;
-				explosion.play();
-                score++;
-				enemysLeft--;
-				break;
-			}
-		}
-
-		for (MagneticAsteroid magneticAsteroid : magneticAsteroidList) {
-			if (magneticAsteroid.collidesWith(spaceship.getCollisionRectangle())){
-				gameOver = true;
-				asteroid.hit();
-			}
-			if (shield.collidesWith(magneticAsteroid.getCollisionRectangle())) {
-				shield.isHit();
-				magneticAsteroid.hit();
-				explosionList.add(new Explosion(magneticAsteroid.getX(), magneticAsteroid.getY(), true));
-				countMagneticAsteroid--;
-				explosion.play();
-                score++;
-				enemysLeft--;
-				break;
-			}
-		}
-
-
 
 		if (spaceship.getSpeedY() == 0 && spaceship.getSpeedX() == 0){
 			spaceship.updateImage("Spaceship.png");
@@ -665,8 +725,11 @@ public class MyGdxGame extends ApplicationAdapter {
 		}
 
 		if (gameOver){
+			Save.io.addHighScore(score);
+			Save.save();
 			gameState = gameState.GAME_OVER;
 			backMusic.stop();
+			highScoreListAdded = false;
 			if (score > highScore){
 				highScore = score;
 			}
@@ -684,17 +747,16 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	public void level1(){
 
-        timer = timer +1;
 		checkInput();
 
-		spaceship.updatePositionFromSpeed();
+		spaceship.updatePositionFromSpeed(Gdx.graphics.getDeltaTime());
 		shield.updatePositionFromSpaceship(spaceship.getX(), spaceship.getY(), Gdx.graphics.getDeltaTime());
 		cannon.updatePositionFromSpaceship(spaceship.getX(), spaceship.getY());
 
 
 
 		spawnNewMagneticAsteroid();
-            spawnNewAsteroid();
+		spawnNewAsteroid();
 
 
 		Gdx.gl.glClearColor(1, 0, 0, 1);
@@ -726,8 +788,27 @@ public class MyGdxGame extends ApplicationAdapter {
 		for (Asteroid asteroid : asteroidList){
 			asteroid.draw(batch);
 		}
+		for (PowerUp powerUp : powerUpList){
+			powerUp.draw(batch);
+		}
 		for (Bullet bullet : bulletList) {
 			bullet.draw(batch);
+		}
+
+		for (PowerUp powerUp : powerUpList){
+			if (powerUp.collidesWith(spaceship.getCollisionRectangle()) || powerUp.collidesWith(shield.getCollisionRectangle())){
+				if (powerUp.getTypePowerUp() == 1){
+					spaceship.powerUpSpeed();
+				}
+				else if (powerUp.getTypePowerUp() == 2){
+					specialShots = 5;
+				}
+				powerUp.hit();
+			}
+			if (powerUp.isHit()){
+				powerUpList.remove(powerUp);
+				break;
+			}
 		}
 
         for (Asteroid asteroid : asteroidList) {
@@ -743,10 +824,14 @@ public class MyGdxGame extends ApplicationAdapter {
                         asteroid.hit();
 						explosionList.add(new Explosion(asteroid.getX(), asteroid.getY(), true));
                         bullet.hit();
+						if (powerUp.shouldSpawn()){
+							powerUpList.add(new PowerUp(asteroid.getX()+(asteroid.getWidth()/2), asteroid.getY() + (asteroid.getHeight()/2)));
+						}
                         countAsteroid--;
                         explosion.play();
                         score++;
 						enemysLeft--;
+                        Random spawn = new Random();
                         break;
                     }
 
@@ -760,23 +845,20 @@ public class MyGdxGame extends ApplicationAdapter {
                 }
 
             }
+
+			if (shield.collidesWith(asteroid.getCollisionRectangle())) {
+				shield.isHit();
+				asteroid.hit();
+				explosionList.add(new Explosion(asteroid.getX(), asteroid.getY(), true));
+				countAsteroid--;
+				explosion.play();
+				score++;
+				enemysLeft--;
+				break;
+			}
+
             if (asteroid.isHit()){
                 asteroidList.remove(asteroid);
-                break;
-            }
-
-        }
-
-
-        for (Asteroid asteroid : asteroidList) {
-            if (shield.collidesWith(asteroid.getCollisionRectangle())) {
-                shield.isHit();
-                asteroid.hit();
-				explosionList.add(new Explosion(asteroid.getX(), asteroid.getY(), true));
-                countAsteroid--;
-                explosion.play();
-                score++;
-				enemysLeft--;
                 break;
             }
         }
@@ -803,7 +885,10 @@ public class MyGdxGame extends ApplicationAdapter {
 		}
 
 		if (gameOver){
+			Save.io.addHighScore(score);
+			Save.save();
 			gameState = gameState.GAME_OVER;
+			highScoreListAdded = false;
 			if (score > highScore){
 				highScore = score;
 			}
@@ -830,11 +915,16 @@ public class MyGdxGame extends ApplicationAdapter {
 		batch.begin();
 		batch.draw(levelOneImg, 0, 0);
 
+		asteroidList.clear();
+		bulletList.clear();
+		explosionList.clear();
+
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
 			titleMusic.stop();
 			backMusic.play();
 			gameState = GameState.LEVEL_2;
 			img = new Texture("spaceBack.jpg");
+			countAsteroid = 0;
 			createNew();
 		}
 		batch.end();
@@ -842,6 +932,11 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	public void level2Complete(){
 		titleMusic.play();
+
+		asteroidList.clear();
+		bulletList.clear();
+		explosionList.clear();
+		magneticAsteroidList.clear();
 
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -852,13 +947,22 @@ public class MyGdxGame extends ApplicationAdapter {
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
 			titleMusic.stop();
 			backMusic.play();
+			countAsteroid = 0;
+			countMagneticAsteroid = 0;
 			gameState = GameState.LEVEL_3;
 			createNew();
 		}
 		batch.end();
 	}
+
 	public void level3Complete(){
 		titleMusic.play();
+
+		asteroidList.clear();
+		bulletList.clear();
+		explosionList.clear();
+		magneticAsteroidList.clear();
+		satelliteList.clear();
 
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -869,6 +973,8 @@ public class MyGdxGame extends ApplicationAdapter {
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
 			titleMusic.stop();
 			backMusic.play();
+			countAsteroid = 0;
+			countMagneticAsteroid = 0;
 			gameState = GameState.LEVEL_4;
 			createNew();
 		}
@@ -895,13 +1001,15 @@ public class MyGdxGame extends ApplicationAdapter {
 				titleMusic.stop();
 				backMusic.play();
 				gameState = GameState.LEVEL_1;
-
+			}
+			else if (menuPos == 1) {
+				gameState = GameState.HIGH_SCORE_SCORE;
 			}
 			else if (menuPos == 2) {
 				gameState = GameState.HELP_SCREEN;
 			}
 			else if (menuPos == 3) {
-				System.exit(0);
+				Gdx.app.exit();
 			}
 			createNew();
 		}
@@ -938,7 +1046,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	public void level3(){
 		checkInput();
-		spaceship.updatePositionFromSpeed();
+		spaceship.updatePositionFromSpeed(Gdx.graphics.getDeltaTime());
 		shield.updatePositionFromSpaceship(spaceship.getX(), spaceship.getY(), Gdx.graphics.getDeltaTime());
 		cannon.updatePositionFromSpaceship(spaceship.getX(), spaceship.getY());
 
@@ -961,7 +1069,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		batch.draw(img, 0, 0);
 		font.setColor(1.0f, 1.0f, 1.0f, 1.0f);
 		font.draw(batch, "Score: " + Integer.toString(score), 20, 25);
-		//font.draw(batch, "Enemy left: " + Integer.toString(enemysLeft), 20, 45);
+		font.draw(batch, "Enemy left: " + Integer.toString(enemysLeft), 20, 45);
 		font.draw(batch, "High Score: " + Integer.toString(highScore), 20, 65);
 		shield.draw(batch);
 		spaceship.draw(batch);
@@ -991,6 +1099,24 @@ public class MyGdxGame extends ApplicationAdapter {
 		for (Satellite satellite : satelliteList){
 			satellite.draw(batch);
 		}
+
+		for (PowerUp powerUp : powerUpList){
+			if (powerUp.collidesWith(spaceship.getCollisionRectangle()) || powerUp.collidesWith(shield.getCollisionRectangle())){
+				if (powerUp.getTypePowerUp() == 1){
+					spaceship.powerUpSpeed();
+				}
+				else if (powerUp.getTypePowerUp() == 2){
+					specialShots = 5;
+				}
+				powerUp.hit();
+			}
+			if (powerUp.isHit()){
+				powerUpList.remove(powerUp);
+				break;
+			}
+
+		}
+
 		for (Asteroid asteroid : asteroidList) {
 			asteroid.updatePositionFromSpeed();
 			if (asteroid.collidesWith(spaceship.getCollisionRectangle())){
@@ -1004,6 +1130,9 @@ public class MyGdxGame extends ApplicationAdapter {
 						asteroid.hit();
 						bullet.hit();
 						explosionList.add(new Explosion(asteroid.getX(), asteroid.getY(), true));
+						if (powerUp.shouldSpawn()){
+							powerUpList.add(new PowerUp(asteroid.getX()+(asteroid.getWidth()/2), asteroid.getY() + (asteroid.getHeight()/2)));
+						}
 						countAsteroid--;
 						score++;
 						enemysLeft--;
@@ -1044,6 +1173,9 @@ public class MyGdxGame extends ApplicationAdapter {
 						magneticAsteroid.hit();
 						bullet.hit();
 						explosionList.add(new Explosion(magneticAsteroid.getX(), magneticAsteroid.getY(), true));
+						if (powerUp.shouldSpawn()){
+							powerUpList.add(new PowerUp(magneticAsteroid.getX()+(magneticAsteroid.getWidth()/2), magneticAsteroid.getY() + (magneticAsteroid.getHeight()/2)));
+						}
 						score++;
 						enemysLeft--;
 						countMagneticAsteroid--;
@@ -1051,6 +1183,20 @@ public class MyGdxGame extends ApplicationAdapter {
 						break;
 					}
 				}
+			}
+
+			if (shield.collidesWith(magneticAsteroid.getCollisionRectangle())) {
+				shield.isHit();
+				magneticAsteroid.hit();
+				explosionList.add(new Explosion(magneticAsteroid.getX(), magneticAsteroid.getY(), true));
+				countMagneticAsteroid--;
+				if (powerUp.shouldSpawn()){
+					powerUpList.add(new PowerUp(magneticAsteroid.getX()+(magneticAsteroid.getWidth()/2), magneticAsteroid.getY() + (magneticAsteroid.getHeight()/2)));
+				}
+				explosion.play();
+				score++;
+				enemysLeft--;
+				break;
 			}
 
 			if (magneticAsteroid.isHit()) {
@@ -1064,6 +1210,9 @@ public class MyGdxGame extends ApplicationAdapter {
 				shield.isHit();
 				asteroid.hit();
 				explosionList.add(new Explosion(asteroid.getX(), asteroid.getY(), true));
+				if (powerUp.shouldSpawn()){
+					powerUpList.add(new PowerUp(asteroid.getX()+(asteroid.getWidth()/2), asteroid.getY() + (asteroid.getHeight()/2)));
+				}
 				countAsteroid--;
 				explosion.play();
 				score++;
@@ -1073,6 +1222,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		}
 
 		for (Satellite satellite : satelliteList){
+
 			for (Bullet bullet : bulletList) {
 				if (bullet instanceof SpaceshipBullet) {
 					if (satellite.collidesWith(bullet.getCollisionRectangle())) {
@@ -1099,20 +1249,23 @@ public class MyGdxGame extends ApplicationAdapter {
 				break;
 			}
 		}
-
+		/**
 		for (MagneticAsteroid magneticAsteroid : magneticAsteroidList) {
 			if (shield.collidesWith(magneticAsteroid.getCollisionRectangle())) {
 				shield.isHit();
 				magneticAsteroid.hit();
 				explosionList.add(new Explosion(magneticAsteroid.getX(), magneticAsteroid.getY(), true));
 				countMagneticAsteroid--;
+				if (powerUp.shouldSpawn()){
+					powerUpList.add(new PowerUp(magneticAsteroid.getX()+(magneticAsteroid.getWidth()/2), magneticAsteroid.getY() + (magneticAsteroid.getHeight()/2)));
+				}
 				explosion.play();
 				score++;
 				enemysLeft--;
 				break;
 			}
 		}
-
+		**/
 
 
 		if (spaceship.getSpeedY() == 0 && spaceship.getSpeedX() == 0){
@@ -1146,37 +1299,41 @@ public class MyGdxGame extends ApplicationAdapter {
 				break;
 			}
 		}
-        if (enemysLeft <= 0){
-            gameState = gameState.LEVEL_COMPLETE_3;
-            backMusic.stop();
-            enemysLeft = 50;
-        }
+
 		if (gameOver){
+			Save.io.addHighScore(score);
+			Save.save();
 			gameState = gameState.GAME_OVER;
+			highScoreListAdded = false;
+			save.save();
 			if (score > highScore){
 				highScore = score;
 			}
 			score = 0;
 			enemysLeft = 15;
+			countAsteroid = 0;
 			gameOver = false;
 			backMusic.stop();
 			titleMusic.play();
 		}
+
+		if (enemysLeft <= 0){
+			gameState = gameState.LEVEL_COMPLETE_3;
+			backMusic.stop();
+			enemysLeft = 15;
+		}
 	}
+
 	public void level4(){
 
 		checkInput();
 
-		spaceship.updatePositionFromSpeed();
+		spaceship.updatePositionFromSpeed(Gdx.graphics.getDeltaTime());
 		shield.updatePositionFromSpaceship(spaceship.getX(), spaceship.getY(), Gdx.graphics.getDeltaTime());
 		cannon.updatePositionFromSpaceship(spaceship.getX(), spaceship.getY());
 
-
-
 		spawnNewMagneticAsteroid();
-spawnNewAsteroid();
-
-
+		spawnNewAsteroid();
 
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -1211,99 +1368,122 @@ spawnNewAsteroid();
 			bullet.draw(batch);
 		}
 		for (GiantAsteroid giantAsteroid : giantAsteroidList){
-            giantAsteroid.draw(batch);
-        }
+			giantAsteroid.draw(batch);
+		}
+		for (JuniorAsteroid juniorAsteroid : juniorAsteriodList){
+			juniorAsteroid.draw(batch);
+		}
 
-        for (JuniorAsteroid juniorAsteroid : juniorAsteriodList){
-            juniorAsteroid.draw(batch);
-        }
+		for (PowerUp powerUp : powerUpList){
+			if (powerUp.collidesWith(spaceship.getCollisionRectangle()) || powerUp.collidesWith(shield.getCollisionRectangle())){
+				if (powerUp.getTypePowerUp() == 1){
+					spaceship.powerUpSpeed();
+				}
+				else if (powerUp.getTypePowerUp() == 2){
+					specialShots = 5;
+				}
+				powerUp.hit();
+			}
+			if (powerUp.isHit()){
+				powerUpList.remove(powerUp);
+				break;
+			}
 
-        for (JuniorAsteroid juniorAsteroid : juniorAsteriodList) {
-            juniorAsteroid.updatePositionFromSpeed();
-            if (juniorAsteroid.collidesWith(spaceship.getCollisionRectangle())){
-                gameOver = true;
-                juniorAsteroid.hit();
-            }
+		}
 
-            for (Bullet bullet : bulletList){
-                if (juniorAsteroid.collidesWith(bullet.getCollisionRectangle())) {
-                    if (bullet instanceof SpaceshipBullet){
-                        juniorAsteroid.hit();
-                        explosionList.add(new Explosion(juniorAsteroid.getX(), juniorAsteroid.getY(), true));
-                        bullet.hit();
-                        explosion.play();
-                        score++;
-                        enemysLeft--;
-                        break;
-                    }
+		for (JuniorAsteroid juniorAsteroid : juniorAsteriodList) {
+			juniorAsteroid.updatePositionFromSpeed();
+			if (juniorAsteroid.collidesWith(spaceship.getCollisionRectangle())){
+				gameOver = true;
+				juniorAsteroid.hit();
+			}
 
-                }
-                if (bullet instanceof SatelliteBullet){
-                    if (shield.collidesWith(bullet.getCollisionRectangle())){
-                        shield.isHit();
-                        bullet.hit();
-                        break;
-                    }
-                }
+			for (Bullet bullet : bulletList){
+				if (juniorAsteroid.collidesWith(bullet.getCollisionRectangle())) {
+					if (bullet instanceof SpaceshipBullet){
+						juniorAsteroid.hit();
+						explosionList.add(new Explosion(juniorAsteroid.getX(), juniorAsteroid.getY(), true));
+						if (powerUp.shouldSpawn()){
+							powerUpList.add(new PowerUp(juniorAsteroid.getX()+(juniorAsteroid.getWidth()/2), juniorAsteroid.getY() + (juniorAsteroid.getHeight()/2)));
+						}
+						bullet.hit();
+						explosion.play();
+						score++;
+						enemysLeft--;
+						break;
+					}
 
-            }
-            if (juniorAsteroid.isHit()){
-                juniorAsteriodList.remove(juniorAsteroid);
-                break;
-            }
+				}
+				if (bullet instanceof SatelliteBullet){
+					if (shield.collidesWith(bullet.getCollisionRectangle())){
+						shield.isHit();
+						bullet.hit();
+						break;
+					}
+				}
 
-        }
+			}
+			if (juniorAsteroid.isHit()){
+				juniorAsteriodList.remove(juniorAsteroid);
+				break;
+			}
 
-
-        for (JuniorAsteroid juniorAsteroid : juniorAsteriodList) {
-            if (shield.collidesWith(juniorAsteroid.getCollisionRectangle())) {
-                shield.isHit();
-                juniorAsteroid.hit();
-                explosionList.add(new Explosion(juniorAsteroid.getX(), juniorAsteroid.getY(), true));
-                explosion.play();
-                score++;
-                enemysLeft--;
-                break;
-            }
-        }
-        for (Asteroid asteroid : asteroidList) {
-            asteroid.updatePositionFromSpeed();
-            if (asteroid.collidesWith(spaceship.getCollisionRectangle())){
-                gameOver = true;
-                asteroid.hit();
-            }
-
-            for (Bullet bullet : bulletList){
-                if (asteroid.collidesWith(bullet.getCollisionRectangle())) {
-                    if (bullet instanceof SpaceshipBullet){
-                        asteroid.hit();
-                        explosionList.add(new Explosion(asteroid.getX(), asteroid.getY(), true));
-                        bullet.hit();
-                        countAsteroid--;
-                        explosion.play();
-                        score++;
-                        enemysLeft--;
-                        break;
-                    }
-
-                }
-                if (bullet instanceof SatelliteBullet){
-                    if (shield.collidesWith(bullet.getCollisionRectangle())){
-                        shield.isHit();
-                        bullet.hit();
-                        break;
-                    }
-                }
-
-            }
-            if (asteroid.isHit()){
-                asteroidList.remove(asteroid);
-                break;
-            }
-
-        }
+		}
 
 
+		for (JuniorAsteroid juniorAsteroid : juniorAsteriodList) {
+			if (shield.collidesWith(juniorAsteroid.getCollisionRectangle())) {
+				shield.isHit();
+				juniorAsteroid.hit();
+				explosionList.add(new Explosion(juniorAsteroid.getX(), juniorAsteroid.getY(), true));
+				if (powerUp.shouldSpawn()){
+					powerUpList.add(new PowerUp(juniorAsteroid.getX()+(juniorAsteroid.getWidth()/2), juniorAsteroid.getY() + (juniorAsteroid.getHeight()/2)));
+				}
+				explosion.play();
+				score++;
+				enemysLeft--;
+				break;
+			}
+		}
+		for (Asteroid asteroid : asteroidList) {
+			asteroid.updatePositionFromSpeed();
+			if (asteroid.collidesWith(spaceship.getCollisionRectangle())){
+				gameOver = true;
+				asteroid.hit();
+			}
+
+			for (Bullet bullet : bulletList){
+				if (asteroid.collidesWith(bullet.getCollisionRectangle())) {
+					if (bullet instanceof SpaceshipBullet){
+						asteroid.hit();
+						explosionList.add(new Explosion(asteroid.getX(), asteroid.getY(), true));
+						if (powerUp.shouldSpawn()){
+							powerUpList.add(new PowerUp(asteroid.getX()+(asteroid.getWidth()/2), asteroid.getY() + (asteroid.getHeight()/2)));
+						}
+						bullet.hit();
+						countAsteroid--;
+						explosion.play();
+						score++;
+						enemysLeft--;
+						break;
+					}
+
+				}
+				if (bullet instanceof SatelliteBullet){
+					if (shield.collidesWith(bullet.getCollisionRectangle())){
+						shield.isHit();
+						bullet.hit();
+						break;
+					}
+				}
+
+			}
+			if (asteroid.isHit()){
+				asteroidList.remove(asteroid);
+				break;
+			}
+
+		}
 
 		for (GiantAsteroid giantAsteroid : giantAsteroidList) {
 			giantAsteroid.updatePositionFromSpeed();
@@ -1314,24 +1494,24 @@ spawnNewAsteroid();
 
 
 			for (Bullet bullet : bulletList){
-                if (giantAsteroid.collidesWith(bullet.getCollisionRectangle())) {
+				if (giantAsteroid.collidesWith(bullet.getCollisionRectangle())) {
 
-                    if (bullet instanceof SpaceshipBullet){
+					if (bullet instanceof SpaceshipBullet){
 
-                        giantAsteroid.hit();
-                        explosionList.add(new Explosion(giantAsteroid.getX(), giantAsteroid.getY(), true));
+						giantAsteroid.hit();
+						explosionList.add(new Explosion(giantAsteroid.getX(), giantAsteroid.getY(), true));
 
-                        bullet.hit();
-                        countGiantAsteroid--;
-                        explosion.play();
-                        spawnJuniorAsteroids(giantAsteroid.getX(), giantAsteroid.getY());
-                        countGiantAsteroid--;
+						bullet.hit();
+						countGiantAsteroid--;
+						explosion.play();
+						spawnJuniorAsteroids(giantAsteroid.getX(), giantAsteroid.getY());
+						countGiantAsteroid--;
 
-                        score++;
-                        break;
-                    }
+						score++;
+						break;
+					}
 
-                }
+				}
 
 				if (bullet instanceof SatelliteBullet){
 					if (shield.collidesWith(bullet.getCollisionRectangle())){
@@ -1342,10 +1522,10 @@ spawnNewAsteroid();
 				}
 
 			}
-            if (giantAsteroid.isHit()){
-                giantAsteroidList.remove(giantAsteroid);
-                break;
-            }
+			if (giantAsteroid.isHit()){
+				giantAsteroidList.remove(giantAsteroid);
+				break;
+			}
 			if (asteroid.isHit()){
 				asteroidList.remove(asteroid);
 				break;
@@ -1359,6 +1539,9 @@ spawnNewAsteroid();
 				shield.isHit();
 				asteroid.hit();
 				explosionList.add(new Explosion(asteroid.getX(), asteroid.getY(), true));
+				if (powerUp.shouldSpawn()){
+					powerUpList.add(new PowerUp(asteroid.getX()+(asteroid.getWidth()/2), asteroid.getY() + (asteroid.getHeight()/2)));
+				}
 				countAsteroid--;
 				explosion.play();
 				score++;
@@ -1390,12 +1573,17 @@ spawnNewAsteroid();
 		}
 
 		if (gameOver){
+			Save.io.addHighScore(score);
+			Save.save();
 			gameState = gameState.GAME_OVER;
+			highScoreListAdded = false;
+			save.save();
 			if (score > highScore){
 				highScore = score;
 			}
 			score = 0;
 			enemysLeft = 15;
+			countAsteroid = 0;
 			gameOver = false;
 			backMusic.stop();
 			titleMusic.play();
@@ -1413,10 +1601,18 @@ spawnNewAsteroid();
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+		asteroidList.clear();
+		bulletList.clear();
+		explosionList.clear();
+		magneticAsteroidList.clear();
+		satelliteList.clear();
+
 		batch.begin();
 		batch.draw(gameOverImage, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
 			titleMusic.stop();
+			countAsteroid = 0;
+			countMagneticAsteroid = 0;
 			gameState = GameState.TITLE_SCREEN;
 		}
 		batch.end();
@@ -1440,6 +1636,39 @@ spawnNewAsteroid();
 		}
 		batch.end();
 	}
+
+	public void addHighScore(){
+		Save.load();
+		highScoresList = Save.io.getHighScores();
+		highScoreText = "";
+		for (int i = highScoresList.length-1; i >= 0; i--){
+			highScoreText += Integer.toString(highScoresList[i]) + "\n";
+		}
+		highScoreListAdded = true;
+	}
+
+	public void renderHighScore(){
+		titleMusic.play();
+		if (!highScoreListAdded){
+			addHighScore();
+		}
+
+		Gdx.gl.glClearColor(1, 0, 0, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		batch.begin();
+		batch.draw(highScoreImg, 0, 0);
+
+		fontHighScore.draw(batch, highScoreText, 180,438);
+		//font.draw(batch, "High Score: " + Integer.toString(highScore), 20, 65);
+
+		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+			gameState = GameState.TITLE_SCREEN;
+			createNew();
+		}
+		batch.end();
+	}
+
+
 
 	@Override
 	public void dispose(){
