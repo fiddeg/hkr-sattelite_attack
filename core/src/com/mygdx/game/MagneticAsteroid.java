@@ -6,56 +6,41 @@ import java.util.Random;
 /**
  * Created by Tari on 2016-11-19.
  */
-public class MagneticAsteroid extends Figure {
+public class MagneticAsteroid extends Asteroid {
 
-    private int timeCounter = 0;
-    private boolean isHit = false;
+    //private boolean isHit = false;
     private float rotationNumber;
 
-    //timecounter makes it update the position every 60 frames instead of each frame//
     public MagneticAsteroid(String textureFileName, float x, float y, int sizeX, int sizeY) {
         super(textureFileName, x, y, sizeX, sizeY);
         rotationNumber = randomRotation();
         setRotation(rotationNumber);
         getSprite().setOriginCenter();
     }
-    public void updatePositionFromSpeed(){
+
+    /*public void updatePositionFromSpeed(){
         super.updatePositionFromSpeed();
-        bounceAtEdge();
+        wrapAround();
         setRotation(getRotation() + rotationNumber);
-        timeCounter++;
-
-        if(timeCounter >=60) {
-            rngDirection();
-            timeCounter = 0;
-        }
 
     }
 
-    //A random number generator to handle the movement of the asteroid in 8 directions//
-    public void rngDirection() {
-
-        Random direction = new Random();
-        float rngX = (direction.nextFloat() - 0.5f) * 2;
-        float rngY = (direction.nextFloat() - 0.5f) * 2;
-
-        rngX = Float.parseFloat(String.format(java.util.Locale.US, "%.1f", rngX));
-        rngY = Float.parseFloat(String.format(java.util.Locale.US, "%.1f", rngY));
-
-
-        while (rngX == 0) {
-            rngX = (direction.nextFloat() - 0.5f) * 2;
+    /*wraparound gives the asteroid the illusion of wrapping around the screen,
+    where it reverts the x and y-values
+    private void wrapAround() {
+        if (getX() < -100) {
+            setX(1301);
         }
-
-        while (rngY == 0) {
-            rngY = (direction.nextFloat() - 0.5f) * 2;
+        if (getX() > 1301) {
+            setX(-100);
         }
-
-        setSpeedX(rngX);
-        setSpeedY(rngY);
+        if (getY() < -100) {
+            setY(601);
+        }
+        if (getY() > 601) {
+            setY(-100);
+        }
     }
-
-
 
     public boolean isHit(){
         return isHit;
@@ -73,6 +58,6 @@ public class MagneticAsteroid extends Figure {
             rotation = -rotation;
         }
         return rotation;
-    }
+    }*/
 
 }

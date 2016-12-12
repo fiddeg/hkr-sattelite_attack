@@ -31,7 +31,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		GAME_OVER
 	}
 
-	private GameState gameState = GameState.TITLE_SCREEN;
+	private GameState gameState = GameState.LEVEL_2;
 	private SpriteBatch batch;
 	private Texture gameOverImage;
 	private Texture img;
@@ -291,39 +291,33 @@ public class MyGdxGame extends ApplicationAdapter {
 	public int randomX(){
 
         Random spawn = new Random();
-        int rngX = (spawn.nextInt(Gdx.graphics.getWidth()-60));
+		int rngX = (spawn.nextInt(Gdx.graphics.getWidth()+200)-100);
 
-        while((float) rngX > spaceship.getX()-100 && (float) rngX < spaceship.getX()+100) {
-            rngX = (spawn.nextInt(Gdx.graphics.getWidth()-60));
-        }
-
-        return rngX;
+		while ( rngX > 0 && rngX < 1200) {
+			rngX = (spawn.nextInt(Gdx.graphics.getWidth()+200)-100);
+		}
+		return rngX;
     }
 
     public int randomY(){
 
         Random spawn = new Random();
-        int rngY = (spawn.nextInt(Gdx.graphics.getHeight()-60));
-
-        while((float) rngY > spaceship.getY()-100 && (float) rngY < spaceship.getY()+100) {
-            rngY = (spawn.nextInt(Gdx.graphics.getHeight()-60));
-        }
+		int rngY = (spawn.nextInt(Gdx.graphics.getHeight()+100)-100);
         return rngY;
     }
 
     public void spawnGiantAsteroid(){
 
-
         while (countGiantAsteroid <= 3){
-    int rngX = randomX();
-    int rngY = randomY();
+    		int rngX = randomX();
+    		int rngY = randomY();
 
-    //int texture = (int)(Math.random()* 2);
+   		 	//int texture = (int)(Math.random()* 2);
 
-    giantAsteroid = new GiantAsteroid("asteroid-icon.png", rngX, rngY, 210, 210);
+   		 	giantAsteroid = new GiantAsteroid("asteroid-icon.png", rngX, rngY, 210, 210);
 
-    giantAsteroidList.add(giantAsteroid);
-    countGiantAsteroid++;
+    		giantAsteroidList.add(giantAsteroid);
+   		 	countGiantAsteroid++;
 
 }
 
@@ -340,7 +334,9 @@ public class MyGdxGame extends ApplicationAdapter {
 			int texture = (int)(Math.random()* 2);
 
             magneticAsteroid = new MagneticAsteroid(magneticAsteroidPicture[texture], rngX, rngY, size, size);
-            magneticAsteroidList.add(magneticAsteroid);
+			magneticAsteroid.setSpeedX(randomSpeed());
+			magneticAsteroid.setSpeedY(randomSpeed());
+			magneticAsteroidList.add(magneticAsteroid);
             countMagneticAsteroid++;
 
         }
@@ -355,6 +351,8 @@ public class MyGdxGame extends ApplicationAdapter {
 			int texture = (int)(Math.random()* 2);
 
 			asteroid = new Asteroid(asteroidPicture[texture], rngX, rngY, size, size);
+			asteroid.setSpeedX(randomSpeed());
+			asteroid.setSpeedY(randomSpeed());
             asteroidList.add(asteroid);
             countAsteroid++;
 		}
@@ -362,11 +360,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	}
     public void spawnJuniorAsteroids(float x, float y) {
 
-
-
-
         for (int i = 0; i < 3; i++){
-
 
             int size = (int)(Math.random()* (70 - 35))+35;
             int texture = (int)(Math.random()* 2);
@@ -387,14 +381,11 @@ public class MyGdxGame extends ApplicationAdapter {
 			int texture = (int)(Math.random()* 2);
 
 			asteroid = new Asteroid(asteroidPicture[texture], rngX, rngY, size, size);
-
+			asteroid.setSpeedX(randomSpeed());
+			asteroid.setSpeedY(randomSpeed());
 			asteroidList.add(asteroid);
 			countAsteroid++;
 		}
-
-
-
-
 	}
 
 
@@ -407,11 +398,22 @@ public class MyGdxGame extends ApplicationAdapter {
 			int texture = (int)(Math.random()* 2);
 
 			magneticAsteroid = new MagneticAsteroid(magneticAsteroidPicture[texture], rngX, rngY, size, size);
-
+			magneticAsteroid.setSpeedX(randomSpeed());
+			magneticAsteroid.setSpeedY(randomSpeed());
 			magneticAsteroidList.add(magneticAsteroid);
 			countMagneticAsteroid++;
 		}
     }
+
+	public float randomSpeed() {
+		Random random = new Random();
+		float randomSpeed = random.nextFloat()*4 -2;
+
+		while (randomSpeed >= -1 && randomSpeed <= 1) {
+			randomSpeed = random.nextFloat()*4 -2;
+		}
+		return randomSpeed;
+	}
 
 	public void randomSatellite(){
 		Random spawn = new Random();
