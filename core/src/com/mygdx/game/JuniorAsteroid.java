@@ -6,7 +6,7 @@ import java.util.Random;
 /**
  * Created by Tari on 2016-11-19.
  */
-public class JuniorAsteroid extends Figure{
+public class JuniorAsteroid extends Figure {
 
     private int timeCounter = 0;
     private boolean isHit = false;
