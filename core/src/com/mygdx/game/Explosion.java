@@ -19,9 +19,9 @@ public class Explosion{
     private boolean hasStarted = false;
     private float x, y;
 
-    public Explosion(float x, float y){
-        this.x = x-20;
-        this.y = y-20;
+    public Explosion(float x, float y, float width, float height){
+        this.x = x-width/2;
+        this.y = y-height/2;
         hasStarted = true;
         batch = new SpriteBatch();
         explosionImg = new Texture("explosion1.png");

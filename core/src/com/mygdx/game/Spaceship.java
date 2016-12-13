@@ -26,7 +26,7 @@ public class Spaceship extends Figure{
     }
 
     public Rectangle getBounds(){
-        return new Rectangle(getX()-200, getY()-200, 400, 400);
+        return new Rectangle(getX()-400, getY()-400, 800, 800);
     }
 
     public void setRotation(float degree){
