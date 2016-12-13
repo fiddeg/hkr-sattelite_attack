@@ -22,10 +22,14 @@ public class Shield extends Figure{
         super.updatePositionFromSpeed();
     }
 
+    public float getTimerForDisable() {
+        return timerForDisable;
+    }
+
     public void updatePositionFromSpaceship(float x, float y, float deltaTime){
         if (timerForDisable > 0){
-            setX(Gdx.graphics.getWidth()+100);
-            setY(Gdx.graphics.getHeight()+100);
+            setX(Gdx.graphics.getWidth()+1000);
+            setY(Gdx.graphics.getHeight()+1000);
             timerForDisable -= deltaTime;
         } else {
             setX(x-10);
@@ -33,7 +37,12 @@ public class Shield extends Figure{
         }
     }
 
-    public void isHit(){
+    public Rectangle getBounds() {
+        return getSprite().getBoundingRectangle();
+    }
+
+
+    public void getHit(){
         timerForDisable = 4;
     }
 
