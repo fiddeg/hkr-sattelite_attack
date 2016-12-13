@@ -21,8 +21,8 @@ public class Figure {
         sprite.setSize(sizeX, sizeY);
         sprite.setX(x);
         sprite.setY(y);
-        SHRINK_COLLISION_RADIUS_X = sizeX/8;
-        SHRINK_COLLISION_RADIUS_Y = sizeY/8;
+        SHRINK_COLLISION_RADIUS_X = sizeX/5;  // Ändrat från 8 till 5 pga Giant Asteroid
+        SHRINK_COLLISION_RADIUS_Y = sizeY/5;
     }
 
     public void updateImage(String filename){

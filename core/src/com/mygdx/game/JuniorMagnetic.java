@@ -1,21 +1,22 @@
-package com.mygdx.game;
 
+
+package com.mygdx.game;
 
 import java.util.Random;
 
 /**
- * Created by Tari on 2016-11-19.
+ * Created by User on 13/12/2016.
  */
-public class JuniorAsteroid extends Asteroid {
+public class JuniorMagnetic extends Figure {
 
     private int timeCounter = 0;
     private boolean isHit = false;
     private float rotationNumber;
 
-
-    public JuniorAsteroid(String textureFileName, float x, float y, int sizeX, int sizeY) {
+    //timecounter makes it update the position every 60 frames instead of each frame//
+    public JuniorMagnetic(String textureFileName, float x, float y, int sizeX, int sizeY) {
         super(textureFileName, x, y, sizeX, sizeY);
-       // rotationNumber = randomRotation();
+        // rotationNumber = randomRotation();
         setRotation(rotationNumber);
         getSprite().setOriginCenter();
     }
@@ -27,7 +28,7 @@ public class JuniorAsteroid extends Asteroid {
         timeCounter++;
 
         if (timeCounter >= 10) {
-            rngDirection();
+            //rngDirection();
             timeCounter = 0;
         }
     }
@@ -48,7 +49,7 @@ public class JuniorAsteroid extends Asteroid {
     }
 
     //A random number generator to handle the movement of the asteroid in 8 directions//
-    private void rngDirection() {
+  /**  private void rngDirection() {
         Random direction = new Random();
         float rngX = (direction.nextFloat() - 0.5f) * 5;
         float rngY = (direction.nextFloat() - 0.5f) * 5;
@@ -69,6 +70,7 @@ public class JuniorAsteroid extends Asteroid {
         setSpeedY(rngY);
 
     }
+   **/
 
     public boolean isHit() {
         return isHit;
@@ -79,14 +81,14 @@ public class JuniorAsteroid extends Asteroid {
     }
 }
 
-       /**  public float randomRotation(){
-         float range = (1.5f - 0.5f) + 0.5f;
-         int negative = (int)(Math.random()* (3 - 1))+1;
-         float rotation = (float)(Math.random() * range) + 0.5f;
-         if (negative == 1){
-         rotation = -rotation;
-         }
-         return rotation;
+/**  public float randomRotation(){
+ float range = (1.5f - 0.5f) + 0.5f;
+ int negative = (int)(Math.random()* (3 - 1))+1;
+ float rotation = (float)(Math.random() * range) + 0.5f;
+ if (negative == 1){
+ rotation = -rotation;
+ }
+ return rotation;
 
-         }
-        **/
+ }
+ **/

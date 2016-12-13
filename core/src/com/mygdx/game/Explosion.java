@@ -1,4 +1,5 @@
 package com.mygdx.game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -12,11 +13,11 @@ public class Explosion{
 
     private Texture explosionImg;
     private TextureRegion[] animationFrames;
-    public Animation animation;
-    public float elapsedTime;
+    private Animation animation;
+    private float elapsedTime;
     private SpriteBatch batch;
-    public boolean hasStarted = false;
-    public float x, y;
+    private boolean hasStarted = false;
+    private float x, y;
 
     public Explosion(float x, float y, boolean started){
         this.x = x-20;
@@ -37,14 +38,7 @@ public class Explosion{
         animation = new Animation(0.01f, animationFrames);
         animation.setPlayMode(Animation.PlayMode.NORMAL);
     }
-
-    public void addExplosion(float deltaTime, float x, float y){
-        elapsedTime += deltaTime;
-        batch.begin();
-        batch.draw(animation.getKeyFrame(elapsedTime), x-20 , y-20);
-        batch.end();
-
-    }
-
 }
+
+
 
