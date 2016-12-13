@@ -3,7 +3,6 @@ package com.mygdx.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.assets.loaders.AssetLoader;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
@@ -77,6 +76,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	private String[] asteroidPicture= new String[]{"brownast.png","brownspotast.png"};
 	private String[] magneticAsteroidPicture= new String[]{"coboltast.png","bluestripeast.png"};
 	private ArrayList<Explosion> explosionList = new ArrayList<Explosion>();
+	private ArrayList<Explosion> explosionGiantList = new ArrayList<Explosion>();
 	private String highScoreText = "";
 	private int[] highScoresList;
 	private ArrayList<PowerUp> powerUpList = new ArrayList<PowerUp>();
@@ -1043,7 +1043,7 @@ public class MyGdxGame extends ApplicationAdapter {
 							if (bullet instanceof SpaceshipBullet){
 
 								giantAsteroid.hit();
-								explosionList.add(new Explosion(giantAsteroid.getX(), giantAsteroid.getY(), giantAsteroid.getWidth(), giantAsteroid.getHeight()));
+								explosionList.add(new Explosion(giantAsteroid.getX(), giantAsteroid.getY(), giantAsteroid.getWidth(), giantAsteroid.getHeight(), true));
 
 								bullet.hit();
 								countGiantAsteroid--;
@@ -1090,7 +1090,7 @@ public class MyGdxGame extends ApplicationAdapter {
 							if (bullet instanceof SpaceshipBullet){
 
 								giantMagnetic.hit();
-								explosionList.add(new Explosion(giantMagnetic.getX(), giantMagnetic.getY(), giantMagnetic.getWidth(), giantMagnetic.getHeight()));
+								explosionList.add(new Explosion(giantMagnetic.getX(), giantMagnetic.getY(), giantMagnetic.getWidth(), giantMagnetic.getHeight(), true));
 
 								bullet.hit();
 								countGiantMagnetic--;
@@ -1164,6 +1164,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				}
 			}
 		}
+
 
 
 		for (Asteroid asteroid : asteroidList){
