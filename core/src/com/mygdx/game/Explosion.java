@@ -19,7 +19,7 @@ public class Explosion{
     private boolean hasStarted = false;
     private float x, y;
 
-    public Explosion(float x, float y, boolean started){
+    public Explosion(float x, float y){
         this.x = x-20;
         this.y = y-20;
         hasStarted = true;
@@ -37,6 +37,34 @@ public class Explosion{
         }
         animation = new Animation(0.01f, animationFrames);
         animation.setPlayMode(Animation.PlayMode.NORMAL);
+    }
+
+    public Animation getAnimation() {
+        return animation;
+    }
+
+    public void setElapsedTime(float elapsedTime) {
+        this.elapsedTime += elapsedTime;
+    }
+
+    public void setElapsedTimeToZero() {
+        this.elapsedTime = 0;
+    }
+
+    public float getElapsedTime() {
+        return elapsedTime;
+    }
+
+    public boolean isHasStarted() {
+        return hasStarted;
+    }
+
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
     }
 }
 

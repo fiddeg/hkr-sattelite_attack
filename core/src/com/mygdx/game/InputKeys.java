@@ -6,6 +6,8 @@ import com.badlogic.gdx.Gdx;
  * Created by Fidde on 2016-12-11.
  */
 public class InputKeys {
+
+    /**
     private static MyGdxGame main = new MyGdxGame().getInstance();
 
     public void checkInput() {
@@ -14,6 +16,7 @@ public class InputKeys {
          * If-statement för att röra skeppet i olika riktningar.
          * / Fredrik
          */
+    /**
         if (Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.W)){
             main.getSpaceship().goUp();
             main.getSpaceship().setRotation(0);
@@ -75,9 +78,11 @@ public class InputKeys {
          * För att skjuta skott med Spacebar.
          * / Fredrik
          */
+    /**
         if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.SPACE)) {
             main.createBulletCannon();
             main.getPew().play();
         }
     }
+     **/
 }
