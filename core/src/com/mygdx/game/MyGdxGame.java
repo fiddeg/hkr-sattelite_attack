@@ -33,7 +33,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		GAME_OVER
 	}
 
-	private GameState gameState = GameState.TITLE_SCREEN;
+	private GameState gameState = GameState.LEVEL_4;
 	private SpriteBatch batch;
 	private Save save = new Save();
 	private Texture gameOverImage;
@@ -398,6 +398,8 @@ public class MyGdxGame extends ApplicationAdapter {
 			int texture = (int)(Math.random()* 2);
 
 			juniorAsteroid = new JuniorAsteroid(asteroidPicture[texture], x, y, size, size);
+			juniorAsteroid.setSpeedX(randomSpeed());
+			juniorAsteroid.setSpeedY(randomSpeed());
 			juniorAsteroidList.add(juniorAsteroid);
 
 		}
@@ -409,6 +411,8 @@ public class MyGdxGame extends ApplicationAdapter {
 			int texture = (int)(Math.random()* 2);
 
 			juniorMagnetic = new JuniorMagnetic(magneticAsteroidPicture[texture], x, y, size, size);
+			juniorMagnetic.setSpeedX(randomSpeed());
+			juniorMagnetic.setSpeedY(randomSpeed());
 			juniorMagneticList.add(juniorMagnetic);
 		}
 	}
