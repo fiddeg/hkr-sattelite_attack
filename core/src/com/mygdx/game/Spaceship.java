@@ -7,8 +7,11 @@ import com.badlogic.gdx.math.Rectangle;
  */
 public class Spaceship extends Figure{
     private float powerUpSpeed;
+    private boolean shieldDown;
+
     public Spaceship(String textureFileName, float x, float y, int sizeX, int sizeY){
         super(textureFileName, x, y, sizeX, sizeY);
+        shieldDown = false;
         powerUpSpeed = 0;
         getSprite().setOriginCenter();
     }
@@ -19,6 +22,16 @@ public class Spaceship extends Figure{
             powerUpSpeed -= delta;
         }
         stopAtEdge();
+    }
+
+    public boolean isShieldDown() {
+        return shieldDown;
+    }
+
+
+
+    public void setShieldDown(boolean shieldDown) {
+        this.shieldDown = shieldDown;
     }
 
     public void powerUpSpeed(){
