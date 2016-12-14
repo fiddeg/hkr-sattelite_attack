@@ -16,18 +16,11 @@ import java.util.ArrayList;
 public class HighScoreIO implements Serializable{
     private static final long serialVersionUID = 1;
     private final int MAX_SCORES = 10;
-    private SpriteBatch batch;
-    private BitmapFont font;
-    private ArrayList<Integer> highScoresList;
     private int[] highScores;
-    private String[] names;
-
-    private int tempScore;
 
     public HighScoreIO(){
         highScores = new int[MAX_SCORES];
         init();
-        //names = new String[MAX_SCORES];
     }
 
     public void init(){
@@ -36,28 +29,12 @@ public class HighScoreIO implements Serializable{
         }
     }
 
-    public ArrayList<Integer> getHighScoresList() {
-        return highScoresList;
-    }
-
     public int[] getHighScores() {
         return highScores;
     }
 
     public void setHighScores(int[] highScores) {
         this.highScores = highScores;
-    }
-
-    public String[] getNames() {
-        return names;
-    }
-
-    public int getTempScore() {
-        return tempScore;
-    }
-
-    public void setTempScore(int tempScore) {
-        this.tempScore = tempScore;
     }
 
     public boolean isHighScore(int score){
@@ -73,21 +50,6 @@ public class HighScoreIO implements Serializable{
 
     public void sortHighScore(){
         Arrays.sort(highScores);
-
-        /**
-        for (int i = 0; i < MAX_SCORES-1; i++){
-            int index = i;
-            int j;
-            for (j = i+1; j < MAX_SCORES; j++){
-                if (highScores[j] < highScores[i]){
-                    index = j;
-                }
-                int smallerNumber = highScores[index];
-                highScores[index] = highScores[i];
-                highScores[i] = smallerNumber;
-            }
-        }
-         **/
     }
 
 

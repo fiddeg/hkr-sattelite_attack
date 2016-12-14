@@ -41,7 +41,6 @@ public class PowerUp{
 
     public static boolean shouldSpawn(){
         int number = (int)(Math.random() * 10);
-        System.out.println(number);
         if (number == 1){
             return true;
         }
@@ -52,7 +51,7 @@ public class PowerUp{
         remove = true;
     }
 
-    public boolean isHit(){
+    public boolean getsHit(){
         return remove;
     }
 
