@@ -41,6 +41,7 @@ public class PowerUp{
 
     public static boolean shouldSpawn(){
         int number = (int)(Math.random() * 10);
+        int numberTest = 1;
         if (number == 1){
             return true;
         }

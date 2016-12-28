@@ -34,6 +34,10 @@ public class Spaceship extends Figure{
         this.shieldDown = shieldDown;
     }
 
+    public float getPowerUpSpeed() {
+        return powerUpSpeed;
+    }
+
     public void powerUpSpeed(){
         powerUpSpeed = 5;
     }

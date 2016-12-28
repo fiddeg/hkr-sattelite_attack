@@ -7,13 +7,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
  * Created by Nikolaj on 2016-12-05.
  */
 public class Explosion{
-
-
     private Texture explosionImg;
     private TextureRegion[] animationFrames;
     private Animation animation;
     private float elapsedTime;
-    private SpriteBatch batch;
     private boolean hasStarted = false;
     private boolean giant;
     private float x, y;
@@ -31,7 +28,6 @@ public class Explosion{
         int FRAME_COLS = 8;
         int FRAME_ROWS = 6;
         hasStarted = true;
-        batch = new SpriteBatch();
         explosionImg = new Texture("explosion1.png");
         TextureRegion[][] tmpFrames = new TextureRegion(explosionImg).split(
                 explosionImg.getWidth()/FRAME_COLS,

@@ -25,6 +25,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		LEVEL_2,
 		LEVEL_3,
 		LEVEL_4,
+		LEVEL_5,
 		LEVEL_COMPLETE_1,
 		LEVEL_COMPLETE_2,
 		LEVEL_COMPLETE_3,
@@ -32,7 +33,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		GAME_OVER
 	}
 
-	private GameState gameState = GameState.LEVEL_4;
+	private GameState gameState = GameState.TITLE_SCREEN;
 	private SpriteBatch batch;
 	private Save save = new Save();
 	private Texture gameOverImage;
@@ -81,7 +82,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	private int countGiantAsteroid= 0;
 	private int countGiantMagnetic= 0;
 	private int score = 0;
-	private int enemysLeft = 15;
+	private int enemiesLeft = 15;
 	private int highScore = 0;
 	private int randomSatellite;
 	private boolean gameOver = false;
@@ -133,9 +134,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	 */
 	private void createObjects(){
 		spaceship = new Spaceship("Spaceship.png", Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, 40, 40);
-
 		shield = new Shield("shield.png", spaceship.getX()-10, spaceship.getY()-10, 60, 60);
-
 		cannon = new Cannon("cannon.png", spaceship.getX()-15, spaceship.getY()-15, 10, 22);
 	}
 
@@ -189,7 +188,6 @@ public class MyGdxGame extends ApplicationAdapter {
 			}
 		}
 
-		//Nikolaj cannon
         if (Gdx.input.isKeyJustPressed(Input.Keys.O)){
             cannon.rotateLeft();
         }
@@ -207,6 +205,30 @@ public class MyGdxGame extends ApplicationAdapter {
 			}
 			pew.play();
         }
+
+		/**
+		 * Input for skipping levels and go to a level direct
+		 */
+
+		if (Gdx.input.isKeyJustPressed(Input.Keys.F1)){
+			gameState = gameState.LEVEL_COMPLETE_1;
+			backMusic.stop();
+			enemiesLeft = 15;
+		} else if (Gdx.input.isKeyJustPressed(Input.Keys.F2)){
+			gameState = gameState.LEVEL_COMPLETE_2;
+			backMusic.stop();
+			enemiesLeft = 15;
+		} else if (Gdx.input.isKeyJustPressed(Input.Keys.F3)){
+			gameState = gameState.LEVEL_COMPLETE_3;
+			backMusic.stop();
+			enemiesLeft = 15;
+		} else if (Gdx.input.isKeyJustPressed(Input.Keys.F4)){
+			gameState = gameState.LEVEL_COMPLETE_4;
+			backMusic.stop();
+			enemiesLeft = 15;
+		} else if (Gdx.input.isKeyJustPressed(Input.Keys.F5)){
+			enemiesLeft = 0;
+		}
 	}
 
 	public void createBulletCannon(){
@@ -248,16 +270,19 @@ public class MyGdxGame extends ApplicationAdapter {
 			titleScreen();
 		}
 		else if (gameState == GameState.LEVEL_1) {
-			createLevels(1);
+			renderLevels(1);
 		}
 		else if (gameState == GameState.LEVEL_2){
-			createLevels(2);
+			renderLevels(2);
 		}
 		else if (gameState == GameState.LEVEL_3){
-			createLevels(3);
+			renderLevels(3);
 		}
 		else if (gameState == GameState.LEVEL_4){
-			createLevels(4);
+			renderLevels(4);
+		}
+		else if (gameState == GameState.LEVEL_5){
+			renderLevels(5);
 		}
 		else if (gameState == GameState.LEVEL_COMPLETE_1) {
 			levelComplete(1);
@@ -333,21 +358,21 @@ public class MyGdxGame extends ApplicationAdapter {
 			int rngY = createRandomYStartPosition();
 
 			giantAsteroid = new GiantAsteroid("asteroid-icon.png", rngX, rngY, 190, 190); // from 210 to 190
-			giantAsteroid.setSpeedX(randomSpeed());
-			giantAsteroid.setSpeedY(randomSpeed());
+			giantAsteroid.setSpeedX(setRandomSpeed());
+			giantAsteroid.setSpeedY(setRandomSpeed());
 			asteroidList.add(giantAsteroid);
 			countGiantAsteroid++;
 		}
 	}
 
 	public void spawnGiantMagnetic(){
-		while (countGiantMagnetic <= 3){
+		while (countGiantMagnetic <= 2){
 			int rngX = createRandomXStartPosition();
 			int rngY = createRandomYStartPosition();
 
 			giantMagnetic = new GiantMagnetic("magnetic-icon.png", rngX, rngY, 190, 190); // from 210 to 190
-			giantMagnetic.setSpeedX(randomSpeed());
-			giantMagnetic.setSpeedY(randomSpeed());
+			giantMagnetic.setSpeedX(setRandomSpeed());
+			giantMagnetic.setSpeedY(setRandomSpeed());
 			asteroidList.add(giantMagnetic);
 			countGiantMagnetic++;
 		}
@@ -362,8 +387,8 @@ public class MyGdxGame extends ApplicationAdapter {
 			int texture = (int)(Math.random()* 2);
 
 			magneticAsteroid = new MagneticAsteroid(magneticAsteroidPicture[texture], rngX, rngY, size, size);
-			magneticAsteroid.setSpeedX(randomSpeed());
-			magneticAsteroid.setSpeedY(randomSpeed());
+			magneticAsteroid.setSpeedX(setRandomSpeed());
+			magneticAsteroid.setSpeedY(setRandomSpeed());
 			asteroidList.add(magneticAsteroid);
 			countMagneticAsteroid++;
 		}
@@ -379,8 +404,8 @@ public class MyGdxGame extends ApplicationAdapter {
 			int texture = (int)(Math.random()* 2);
 
 			asteroid = new Asteroid(asteroidPicture[texture], rngX, rngY, size, size);
-			asteroid.setSpeedX(randomSpeed());
-			asteroid.setSpeedY(randomSpeed());
+			asteroid.setSpeedX(setRandomSpeed());
+			asteroid.setSpeedY(setRandomSpeed());
 			asteroidList.add(asteroid);
 			countAsteroid++;
 		}
@@ -394,8 +419,8 @@ public class MyGdxGame extends ApplicationAdapter {
 			int texture = (int)(Math.random()* 2);
 
 			juniorAsteroid = new JuniorAsteroid(asteroidPicture[texture], x, y, size, size);
-			juniorAsteroid.setSpeedX(randomSpeed());
-			juniorAsteroid.setSpeedY(randomSpeed());
+			juniorAsteroid.setSpeedX(setRandomSpeed());
+			juniorAsteroid.setSpeedY(setRandomSpeed());
 			asteroidList.add(juniorAsteroid);
 		}
 
@@ -406,13 +431,13 @@ public class MyGdxGame extends ApplicationAdapter {
 			int texture = (int)(Math.random()* 2);
 
 			juniorMagnetic = new JuniorMagnetic(magneticAsteroidPicture[texture], x, y, size, size);
-			juniorMagnetic.setSpeedX(randomSpeed());
-			juniorMagnetic.setSpeedY(randomSpeed());
+			juniorMagnetic.setSpeedX(setRandomSpeed());
+			juniorMagnetic.setSpeedY(setRandomSpeed());
 			asteroidList.add(juniorMagnetic);
 		}
 	}
 
-	public float randomSpeed() {
+	public float setRandomSpeed() {
 		Random random = new Random();
 		float randomSpeed = random.nextFloat()*4 -2;
 
@@ -546,6 +571,8 @@ public class MyGdxGame extends ApplicationAdapter {
 		asteroidList.clear();
 		bulletList.clear();
 		explosionList.clear();
+		satelliteList.clear();
+		powerUpList.clear();
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
 			titleMusic.stop();
@@ -557,11 +584,14 @@ public class MyGdxGame extends ApplicationAdapter {
 			} else if (level == 3){
 				gameState = GameState.LEVEL_4;
 			} else if (level == 4){
-				gameState = GameState.TITLE_SCREEN;
+				gameState = GameState.LEVEL_5;
 			}
 
 			img = new Texture("spaceBack.jpg");
 			countAsteroid = 0;
+			countMagneticAsteroid = 0;
+			countGiantAsteroid = 0;
+			countGiantMagnetic = 0;
 			createNew();
 		}
 
@@ -582,7 +612,6 @@ public class MyGdxGame extends ApplicationAdapter {
 
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-			//titleMusic.stop();
 			if (menuPos == 0) {
 				titleMusic.stop();
 				backMusic.play();
@@ -639,6 +668,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		bulletList.clear();
 		explosionList.clear();
 		satelliteList.clear();
+		powerUpList.clear();
 
 		batch.begin();
 		batch.draw(gameOverImage, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -700,7 +730,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		batch.end();
 	}
 
-	public void createLevels(int level){
+	public void renderLevels(int level){
 		checkInput();
 
 		spaceship.updatePositionFromSpeed(Gdx.graphics.getDeltaTime());
@@ -721,23 +751,27 @@ public class MyGdxGame extends ApplicationAdapter {
 						asteroid.hit();
 						if (asteroid instanceof GiantMagnetic){
 							explosionList.add(new Explosion(asteroid.getX(), asteroid.getY(), asteroid.getWidth(), asteroid.getHeight(), true));
+							countGiantMagnetic--;
 							spawnJuniorMagnetic(asteroid.getX()+(asteroid.getWidth()/2), asteroid.getY()+(asteroid.getHeight()/2));
 						} else if (asteroid instanceof GiantAsteroid){
 							explosionList.add(new Explosion(asteroid.getX(), asteroid.getY(), asteroid.getWidth(), asteroid.getHeight(), true));
+							countGiantAsteroid--;
 							spawnJuniorAsteroids(asteroid.getX()+(asteroid.getWidth()/2), asteroid.getY()+(asteroid.getHeight()/2));
 						} else {
 							explosionList.add(new Explosion(asteroid.getX(), asteroid.getY(), asteroid.getWidth(), asteroid.getHeight(), false));
+							if (asteroid instanceof MagneticAsteroid){
+								countMagneticAsteroid--;
+							} else {
+								countAsteroid--;
+							}
 						}
 						bullet.hit();
 						if (powerUp.shouldSpawn()){
 							powerUpList.add(new PowerUp(asteroid.getX()+(asteroid.getWidth()/2), asteroid.getY() + (asteroid.getHeight()/2)));
 						}
-
-
-						countAsteroid--;
 						explosion.play();
 						score++;
-						enemysLeft--;
+						enemiesLeft--;
 						break;
 					}
 
@@ -758,17 +792,23 @@ public class MyGdxGame extends ApplicationAdapter {
 
 				if (asteroid instanceof GiantMagnetic){
 					explosionList.add(new Explosion(asteroid.getX(), asteroid.getY(), asteroid.getWidth(), asteroid.getHeight(), true));
+					countGiantMagnetic--;
 					spawnJuniorMagnetic(asteroid.getX()+(asteroid.getWidth()/2), asteroid.getY()+(asteroid.getHeight()/2));
 				} else if (asteroid instanceof GiantAsteroid){
 					explosionList.add(new Explosion(asteroid.getX(), asteroid.getY(), asteroid.getWidth(), asteroid.getHeight(), true));
+					countGiantAsteroid--;
 					spawnJuniorAsteroids(asteroid.getX()+(asteroid.getWidth()/2), asteroid.getY()+(asteroid.getHeight()/2));
 				} else {
 					explosionList.add(new Explosion(asteroid.getX(), asteroid.getY(), asteroid.getWidth(), asteroid.getHeight(), false));
+					if (asteroid instanceof MagneticAsteroid){
+						countMagneticAsteroid--;
+					} else {
+						countAsteroid--;
+					}
 				}
-				countAsteroid--;
 				explosion.play();
 				score++;
-				enemysLeft--;
+				enemiesLeft--;
 				break;
 			}
 
@@ -778,12 +818,10 @@ public class MyGdxGame extends ApplicationAdapter {
 			}
 		}
 
-
 		if (level >= 2) {
 			spawnMagneticAsteroid();
 			makeMagneticAsteroidFollow();
 		}
-
 
 		if (level >= 3){
 
@@ -803,7 +841,7 @@ public class MyGdxGame extends ApplicationAdapter {
 							bullet.hit();
 							explosionList.add(new Explosion(satellite.getX(), satellite.getY(), satellite.getWidth(), satellite.getHeight(),false));
 							score++;
-							enemysLeft--;
+							enemiesLeft--;
 							break;
 						}
 					}
@@ -820,7 +858,7 @@ public class MyGdxGame extends ApplicationAdapter {
 					shield.getHit();
 					explosionList.add(new Explosion(satellite.getX(), satellite.getY(), satellite.getWidth(), satellite.getHeight(), false));
 					score++;
-					enemysLeft--;
+					enemiesLeft--;
 					break;
 				}
 			}
@@ -837,7 +875,7 @@ public class MyGdxGame extends ApplicationAdapter {
 					spaceship.powerUpSpeed();
 				}
 				else if (powerUp.getTypePowerUp() == 2){
-					specialShots = 5;
+					specialShots += 5;
 				}
 				powerUp.hit();
 			}
@@ -854,8 +892,21 @@ public class MyGdxGame extends ApplicationAdapter {
 		batch.begin();
 		batch.draw(img, 0, 0);
 		font.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+		if (specialShots != 0){
+			font.draw(batch, "Special shots left: " + Integer.toString(specialShots), Gdx.graphics.getWidth()-140, Gdx.graphics.getHeight()-10);
+		}
+		if (spaceship.getPowerUpSpeed() > 0){
+			font.draw(batch, "Speed-boost time left: " + String.format(java.util.Locale.US,"%.1f", spaceship.getPowerUpSpeed()), Gdx.graphics.getWidth()-180, Gdx.graphics.getHeight()-30);
+		}
+
+		font.draw(batch, "Level - " + Integer.toString(level), 20, Gdx.graphics.getHeight()-10);
 		font.draw(batch, "Score: " + Integer.toString(score), 20, 25);
-		font.draw(batch, "Enemy left: " + Integer.toString(enemysLeft), 20, 45);
+		if (level <= 4){
+			font.draw(batch, "Enemy left: " + Integer.toString(enemiesLeft), 20, 45);
+		} else {
+			font.draw(batch, "Enemy left: Unlimited", 20, 45);
+		}
 		font.draw(batch, "High Score: " + Integer.toString(highScore), 20, 65);
 		shield.draw(batch);
 		spaceship.draw(batch);
@@ -876,9 +927,6 @@ public class MyGdxGame extends ApplicationAdapter {
 				}
 			}
 		}
-
-
-
 		for (Asteroid asteroid : asteroidList){
 			asteroid.draw(batch);
 		}
@@ -894,8 +942,8 @@ public class MyGdxGame extends ApplicationAdapter {
 				satellite.draw(batch);
 			}
 		}
-
 		batch.end();
+
 
 		if (spaceship.getSpeedY() == 0 && spaceship.getSpeedX() == 0){
 			spaceship.updateImage("Spaceship.png");
@@ -940,27 +988,30 @@ public class MyGdxGame extends ApplicationAdapter {
 				highScore = score;
 			}
 			score = 0;
-			enemysLeft = 15;
+			enemiesLeft = 15;
 			countAsteroid = 0;
-			asteroidList.clear();
+			countMagneticAsteroid = 0;
+			countGiantAsteroid = 0;
+			countGiantMagnetic = 0;
 			gameOver = false;
 			backMusic.stop();
 			titleMusic.play();
 		}
 
-		if (enemysLeft <= 0){
-			if (level == 1){
-				gameState = gameState.LEVEL_COMPLETE_1;
-			} else if (level == 2){
-				gameState = gameState.LEVEL_COMPLETE_2;
-			} else if (level == 3){
-				gameState = gameState.LEVEL_COMPLETE_3;
-			} else if (level == 4){
-				gameState = gameState.LEVEL_COMPLETE_4;
+		if (level <= 4){
+			if (enemiesLeft <= 0){
+				if (level == 1){
+					gameState = gameState.LEVEL_COMPLETE_1;
+				} else if (level == 2){
+					gameState = gameState.LEVEL_COMPLETE_2;
+				} else if (level == 3){
+					gameState = gameState.LEVEL_COMPLETE_3;
+				} else if (level == 4){
+					gameState = gameState.LEVEL_COMPLETE_4;
+				}
+				backMusic.stop();
+				enemiesLeft = 15;
 			}
-			asteroidList.clear();
-			backMusic.stop();
-			enemysLeft = 15;
 		}
 
 	}
